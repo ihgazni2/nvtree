@@ -38,12 +38,20 @@ function dict_length(d) {
     return(entries.length)
 }
 
-function dict_map(d,f) {
+function dict_foreach(d,f) {
     for(let k in d) {
         f(k,d[k])
     }
     return(d)
 }
+
+function dict_map(d,f) {
+    for(let k in d) {
+        d[k] = f(k,d[k])
+    }
+    return(d)
+}
+
 
 function dtb_kv_rm(k,v,dtb) {
     dtb = dtb.filter(r=>(r[k]!==v))
@@ -67,6 +75,7 @@ module.exports = {
     dict_values:dict_values,
     dict_keys:dict_keys,
     dict_map:dict_map,
+    dict_foreach:dict_foreach,
     dict_length:dict_length,
     dtb_kv_rm,
     dtb_kv_get_seq,

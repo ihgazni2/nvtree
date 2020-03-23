@@ -62,6 +62,7 @@ function dflt_sdfs_calc_conns(nd,nodes) {
             conns.push('t')
         }
         nd._ui.conns = conns
+        nd._ui.display = true
     }
     return(nd)
 }
@@ -76,6 +77,7 @@ function get_sdfs_repr_arr(nd,nodes,f){
     conns_array = conns_array.map(conns=>conns.slice(depth))
     conns_array = conns_array.map(conns=>conns2repr(conns,dflt_sdfs_show_connd))
     let arr = conns_array.map((conns,i)=>(conns+sdfs[i]._id))
+    arr = arr.filter((r,i)=>(sdfs[i]._ui.display === true))
     return(arr)
 }
 
@@ -230,7 +232,52 @@ function edfs_show_from_to(nd,nodes,from,to,f=dflt_edfs_show_callback){
 }
 
 
-//
+//sedfs
+
+const dflt_sedfs_show_connd = {
+    indent:'    ',
+    stag_prefix:'<',
+    stag_suffix:'>',
+    etag_prefix:'</',
+    etag_suffix:'>',
+}
+
+
+function gen_tag(tag,prefix,suffix) {
+    return(prefix+tag+suffix)
+}
+
+function sedfs_show_all(nd,nodes,show_connd=dflt_sedfs_show_connd) {
+    let sedfs = ndfunc.get_sedfs(nd,nodes,true)
+    let depths = sedfs.map(nd=>ndfunc.get_depth(nd,nodes))
+    let depth = ndfunc.get_depth(nd,nodes)
+    let indents = depths.map(r=>show_connd.indent.repeat(r-depth)) 
+    let tags = sedfs.map(
+        nd=>{
+            if(nd._$visited === false) {
+                return(gen_tag(nd._id,show_connd.stag_prefix,show_connd.stag_suffix))
+            } else {
+                return(gen_tag(nd._id,show_connd.etag_prefix,show_connd.etag_suffix))
+            }
+        }
+    )
+    let lines = tags.map((tag,i)=>(indents[i]+tag)) 
+    let repr = lines.join('\n')
+    console.log(repr)
+}
+
+function sdfs_expand(nd,nodes,f=dflt_sdfs_show_callback) {
+    let sdfs = ndfunc.get_deses(nd,nodes,including_self=false)
+    sdfs.forEach(nd=>{nd._ui.display = true})
+    return(nodes)
+}
+
+function sdfs_foldup(nd,nodes,f=dflt_sdfs_show_callback) {
+    let sdfs = ndfunc.get_deses(nd,nodes,including_self=false)
+    sdfs.forEach(nd=>{nd._ui.display = false})
+    return(nodes)
+}
+
 
 module.exports = {
     dflt_calc_conn_map_func,
@@ -245,6 +292,8 @@ module.exports = {
     sdfs_show_from,
     sdfs_show_to,
     sdfs_show_from_to,
+    sdfs_expand,
+    sdfs_foldup,
     //edfs
     dflt_edfs_show_connd,
     dflt_edfs_calc_conns,
@@ -254,6 +303,9 @@ module.exports = {
     edfs_show_from,
     edfs_show_to,
     edfs_show_from_to,
-    //sedfs     
+    //sedfs
+    dflt_sedfs_show_connd,
+    gen_tag,
+    sedfs_show_all,           
 }
 

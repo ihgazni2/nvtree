@@ -748,15 +748,94 @@ function get_edfs(nd,nodes) {
     return(edfs)
 }
 
-//
+//sedfs
 
-function get_sedfs(nd,nodes) {
+function clear_$visited(nodes) {
+    cmmn.dict_foreach(nodes,(k,v)=>{nodes[k]._$visited = false})    
 }
+
+function get_sedfs_next(nd,nodes) {
+    let visited = nd._$visited
+    let cond = is_leaf(nd)
+    if(cond) {
+        if(visited) {
+            let rsib = get_rsib(nd,nodes)
+            if(rsib === null) {
+                return(get_parent(nd,nodes))  
+            } else {
+                return(rsib)
+            } 
+        } else {
+            nd._$visited = true
+            return(nd)
+        }
+    } else {
+        if(visited) {
+            let rsib = get_rsib(nd,nodes)
+            if(rsib === null) {
+                return(get_parent(nd,nodes)) 
+            } else {
+                return(rsib)
+            } 
+        } else {
+            nd._$visited = true
+            return(get_fstch(nd,nodes))    
+        }
+    }    
+}
+
+
+function get_sedfs_prev(visited,nd,nodes) {
+    let cond = is_leaf(nd)
+    if(cond) {
+        if(visited) {
+            return(nd)
+        } else {
+            let lsib = get_lsib(nd,nodes)
+            if(lsib === null) {
+                return(get_parent(nd,nodes))
+            } else {
+                return(lsib)
+            }
+        }
+    } else {
+        if(visited) {
+            return(get_lstch(nd,nodes))
+        } else {
+            let lsib = get_lsib(nd,nodes)
+            if(lsib === null) {
+                return(get_parent(nd,nodes))
+            } else {
+                return(lsib)
+            }
+        }
+    }
+}
+
+function is_sedfs_traverse_finished(start_id,nd) {
+    let cond = (nd._$visited) && (start_id === nd._id)
+    return(cond)
+}
+
+function get_sedfs(nd,nodes,deepcopy=false,clear=true) {
+    let sedfs = []
+    clear_$visited(nodes)   
+    let start_id = nd._id
+    while(!is_sedfs_traverse_finished(start_id,nd)) {
+        deepcopy? sedfs.push(cmmn.dcp(nd)):sedfs.push(nd)
+        nd = get_sedfs_next(nd,nodes)
+    }
+    deepcopy?sedfs.push(cmmn.dcp(nd)):sedfs.push(nd)
+    if(clear){
+        clear_$visited(nodes)
+    }
+    return(sedfs)
+}
+
+//
 
 function get_mat(nd,nodes) {
 }
-//
-
 
 function mat2sdfs(mat,nodes) {
 }
@@ -899,6 +978,12 @@ module.exports = {
     get_edfs_next:get_edfs_next,
     get_edfs_prev:get_edfs_prev,
     get_edfs:get_edfs,
+    //sedfs
+    clear_$visited:clear_$visited,
+    get_sedfs_next:get_sedfs_next,
+    is_sedfs_traverse_finished:is_sedfs_traverse_finished,
+    get_sedfs_prev:get_sedfs_prev,    
+    get_sedfs:get_sedfs,
     //
     get_deses:get_deses,
     get_fst_lyr_deses:get_fst_lyr_deses,
