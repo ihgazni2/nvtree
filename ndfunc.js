@@ -1,5 +1,22 @@
 const cmmn = require("./cmmn.js")
 
+//util
+
+function calc_next_id(nodes) {
+    let ids = cmmn.dict_keys(nodes)
+    return(Math.max(...ids)+1)
+}
+
+function update_nodes_ids(nodes0,nodes1) {
+    let next_id = calc_next_id(nodes0)
+    for(let id in nodes1) {
+        nodes1[id]._id = nodes1[id]._id + next_id
+    }
+    return(nodes1)
+}
+
+//
+
 function creat_root(n=0){
     let _id = n
     let root = {
@@ -8,7 +25,7 @@ function creat_root(n=0){
         _lsib:null,
         _rsib:null,
         _parent:null,
-        _tree:_id
+        _tree:_id  //属于哪个tree
     }
     return(root)
 }
@@ -18,7 +35,7 @@ function creat_nd(nodes,n=0) {
     /*
         by_dflt  leaf_nd
     */
-    let _id = cmmn.calc_next_id(nodes)+n
+    let _id = calc_next_id(nodes)+n
     let nd = {
         _id:_id,
         _fstch:null,
@@ -31,39 +48,53 @@ function creat_nd(nodes,n=0) {
 }
 
 
+//
+
 function is_inited(nd) {
+    //被添加到了树上
     let cond = (nd._tree !== undefined)
     return(cond)
 }
 
 function is_root(nd) {
+    //tree 是自己
     let cond0 = (nd._tree!== undefined)
     let cond1 = (nd._tree === nd._id)
     return(cond0 && cond1)
 }
 
 function is_fstch(nd) {
+    //没有左兄弟
     let cond = (nd._lsib === null)
     return(cond)
 }
 
 function is_lstch(nd) {
+    //没有右兄弟
     let cond = (nd._rsib === null)
     return(cond)
 }
 
 function is_leaf(nd) {
+    //没有子
     let cond = (nd._fstch === null)
     return(cond)
 }
 
+/*
 function eq(nd0,nd1) {
-    return(nd0._id === nd1._id)
+    //id 必须完全一致
+    //只有同一颗树下自己等于自己
+    let cond0 = (nd0._id === nd1._id)
+    let cond1 = (nd0._tree === nd1._tree)
+    return(cond0 && cond1)
 }
-
+*/
 
 //
+
 function prepend_child(nd,child,nodes) {
+    //只有根节点才可以被链接到另一颗树上
     let cond = is_leaf(nd)
     child._tree = nd._tree
     child._lsib = null
@@ -82,8 +113,10 @@ function prepend_child(nd,child,nodes) {
     }
     nd._fstch = child._id
     nodes[child._id] = child
+    //返回当前节点
     return(nd)
 }
+
 
 function append_child(nd,child,nodes) {
     let cond = is_leaf(nd)
@@ -174,11 +207,29 @@ function insert_child(which,nd,child,nodes) {
 
 /**/
 function disconnect(nd,nodes) {
+    //操作自己
 }
+
+//在父节点上操作
+function rm_fstch(nd,nodes) {
+}
+
+function rm_lstch(nd,nodes) {
+}
+
+function rm_which(index,nd,nodes) {
+}
+
+function rm_some(indexes,nd,nodes) {
+}
+
+function rm_all(nd,nodes) {
+}
+
 
 /**/
 
-//
+//child
 
 function get_fstch(nd,nodes) {
     let fstch = (nd._fstch===null)?null:nodes[nd._fstch]
@@ -239,16 +290,21 @@ function get_some_children(nd,nodes,...whiches) {
 }
 
 
-////
-function get_lstsib(nd,nodes) {
+////sibs
+function get_lstsib(nd,nodes,including_self=false) {
     let lstrsib = nd
     let rsib = get_rsib(nd,nodes)
     while(rsib!==null) {
         lstrsib = rsib
         rsib = get_rsib(rsib,nodes)
     }
-    return(lstrsib)
+    if(including_self){
+        return(lstrsib)
+    } else {
+        return(null)
+    }
 }
+
 
 function get_preceding_sibs(nd,nodes) {
     let sibs = get_sibs(nd,nodes,including_self=true)
@@ -286,7 +342,12 @@ function get_following_sibs(nd,nodes) {
 
 function get_sibs(nd,nodes,including_self=false) {
     let parent = get_parent(nd,nodes)
-    let sibs = get_children(parent,nodes)
+    let sibs;
+    if(parent !== null) { 
+        sibs = get_children(parent,nodes)
+    } else {
+        sibs =[nd]
+    }
     if(including_self) {
         return(sibs)
     } else {
@@ -295,9 +356,17 @@ function get_sibs(nd,nodes,including_self=false) {
     return(sibs)
 }
 
-function get_fstsib(nd,nodes) {
+function get_fstsib(nd,nodes,including_self=false) {
     let sibs = get_sibs(nd,nodes,including_self=true)
-    return(sibs[0])
+    if(including_self) {
+        return(sibs[0])
+    } else {
+        if(sibs[0]._id === nd._id) {
+            return(null)
+        } else {
+            return(sibs[0])
+        }
+    }
 }
 
 
@@ -352,18 +421,61 @@ function get_rsib(nd,nodes) {
     return(rsib)
 }
 
-//
+//layer
+
+function get_depth(nd,nodes) {
+    let ances = get_ances(nd,nodes,including_self=true)
+    return(ances.length-1)
+}
+
+function get_height(nd,nodes) {
+    let depth = get_depth(nd,nodes)
+    let sdfs = get_sdfs(nd,nodes)
+    let des_depths = sdfs.map(r=>get_depth(r,nodes))
+    let max = Math.max(...des_depths)
+    return(max-depth+1)
+}
+
+function get_fst_lyr_des_depth(nd,nodes) {
+    let cond = is_leaf(nd)
+    if(cond) {
+        return(null)
+    } else {
+        let depth = get_depth(nd,nodes)
+        return(depth+1)
+    }
+}
+
+function get_lst_lyr_des_depth(nd,nodes) {
+    let cond = is_leaf(nd)
+    if(cond) {
+        return(null)
+    } else {
+        let depth = get_depth(nd,nodes)
+        let sdfs = get_sdfs(nd,nodes)
+        let des_depths = sdfs.map(r=>get_depth(r,nodes))
+        let max = Math.max(...des_depths)
+        return(max)
+    }
+}
+
+function get_which_lyr_des_depth(which,nd,nodes) {
+    let depth = get_depth(nd,nodes)
+    let height = get_height(nd,nodes)
+    if(height<=which){
+        return(null)
+    } else {
+        return(depth+which)
+    }
+}
+
 
 function get_lyr(nd,nodes) {
-    let parent = get_parent(nd,nodes)
-    if(parent === null) {
-        return([nd])
-    } else {
-        let parent_sibs = get_sibs(parent,nodes,including_self=true)
-        let childrens = parent_sibs.map(r=>(get_children(r,nodes)))
-        let lyr = Array.prototype.concat(...childrens)
-        return(lyr)
-    }
+    let root = get_root(nd,nodes)
+    let sdfs = get_sdfs(root,nodes)
+    let depth = get_depth(nd,nodes)
+    let lyr = sdfs.filter(nd=>(get_depth(nd,nodes) === depth))
+    return(lyr) 
 }
 
 function get_breadth(nd,nodes) {
@@ -372,12 +484,13 @@ function get_breadth(nd,nodes) {
     return(breadth)
 }
 
+
 function get_count(nd,nodes) {
     let sdfs = get_sdfs(nd,nodes)
     return(sdfs.length)
 }
 
-//
+//ance
 function get_root(nd,nodes) {
     /*
         get_root(root,nodes)
@@ -397,7 +510,7 @@ function get_parent(nd,nodes) {
     if(is_root(nd)) {
         parent = null
     } else {
-        let lstrsib = get_lstsib(nd,nodes)
+        let lstrsib = get_lstsib(nd,nodes,true)
         parent = nodes[lstrsib._parent]
     }
     return(parent)
@@ -449,41 +562,15 @@ function get_some_ances(nd,nodes,...whiches) {
 }
 
 
-function get_depth(nd,nodes) {
-    let ances = get_ances(nd,nodes,including_self=true)
-    return(ances.length-1)
-}
 
-function get_height(nd,nodes) {
-    let depth = get_depth(nd,nodes)
-    let sdfs = get_sdfs(nd,nodes)
-    let des_depths = sdfs.map(r=>get_depth(r,nodes))
-    let max = Math.max(...des_depths)
-    return(max-depth+1)
-}
-
-function get_fst_des_depth(nd,nodes) {
-    let depth = get_depth(nd,nodes)
-    return(depth+1)
-}
-
-function get_lst_des_depth(nd,nodes) {
-    let depth = get_depth(nd,nodes)
-    let sdfs = get_sdfs(nd,nodes)
-    let des_depths = sdfs.map(r=>get_depth(r,nodes))
-    let max = Math.max(...des_depths)
-    return(max)
-}
-
-function get_which_des_depth(which,nd,nodes) {
-    let depth = get_depth(nd,nodes)
-    return(depth+which)
-}
-
-
-//
+//sdfs  depth-first  record-when-open-tag
 
 function get_rsib_of_fst_ance_having_rsib(nd,nodes) {
+    /*
+        along the parent chain until root,not_including_self
+        if the parent have rsib,return the rsib-of-parent
+        ---------
+    */
     let parent = get_parent(nd,nodes)
     while(parent!==null) {
         let rsib = get_rsib(parent,nodes)
@@ -498,6 +585,12 @@ function get_rsib_of_fst_ance_having_rsib(nd,nodes) {
 
 
 function get_sdfs_next(nd,nodes) {
+    /*
+        如果有child, 返回first-child
+            如果有rsib,返回rsib
+                沿着祖先链往上,找到第一个有rsib的ance,返回这个ance的rsib
+        如果返回null,表明当前节点是sdfs数组的最后一个节点
+    */
     let fstch = get_fstch(nd,nodes)
     if(fstch !== null) {
         return(fstch)
@@ -512,6 +605,10 @@ function get_sdfs_next(nd,nodes) {
 }
 
 function get_drmost_des(nd,nodes){
+    /*
+       down-most  and right-most of subtree
+       including_self
+    */
     let old_lstch = nd
     let lstch = get_lstch(nd,nodes)
     while(lstch !== null) {
@@ -522,6 +619,17 @@ function get_drmost_des(nd,nodes){
 }
 
 function get_sdfs_prev(nd,nodes) {
+    /*
+        如果是root ,返回null 因为root 是起始点
+        如果是叶子节点
+            如果有lsib,返回lsib
+            如果没有lsib,返回parent(没有lsib 说明这个节点是first-child)
+        如果不是叶子节点
+             如果有左邻居
+                 lsib是leaf,返回lsib
+                 lsib不是leaf,返回drmost-of-lsib 
+             如果没有lsib,返回parent
+    */ 
     if(is_root(nd)) {
         return(null)
     }
@@ -567,12 +675,80 @@ function get_sdfs(nd,nodes) {
     return(sdfs)
 }
 
+//edfs
 
 
+function get_dlmost_des(nd,nodes) {
+    /*
+        including_self
+    */
+    let old_fstch = nd
+    let fstch = get_fstch(nd,nodes)
+    while(fstch !== null) {
+        old_fstch = fstch
+        fstch = get_fstch(fstch,nodes)
+    }
+    return(old_fstch)
+}
+
+function get_edfs_next(nd,nodes) {
+    let rsib = get_rsib(nd,nodes)
+    if(rsib === null) {
+        //如果没有右兄弟，说明节点是lstch,此时应该返回父节点
+        let p = get_parent(nd,nodes)
+        return(p)
+    } else {
+       //如果有右兄弟，返回down-left-most-of-rsib
+       return(get_dlmost_des(rsib,nodes))
+    }
+}
+
+function get_lsib_of_fst_ance_having_lsib(nd,nodes) {
+    /*
+        along the parent chain until root,not_including_self
+        if the parent have lsib,return the lsib-of-parent
+        ---------
+    */
+    let parent = get_parent(nd,nodes)
+    while(parent!==null) {
+        let lsib = get_lsib(parent,nodes)
+        if(lsib!==null) {
+            return(lsib)
+        } else {
+            parent = get_parent(parent,nodes)
+        }
+    }
+    return(null)
+}
+
+
+
+function get_edfs_prev(nd,nodes) {
+    let cond = is_leaf(nd)
+    if(!cond) {
+        return(get_lstch(nd,nodes))
+    } else {
+       let lsib = get_lsib(nd,nodes)
+       if(lsib === null) {
+           return(get_lsib_of_fst_ance_having_lsib(nd,nodes))
+       } else {
+           return(lsib)
+       }
+    }    
+}
 
 
 function get_edfs(nd,nodes) {
+    let edfs = []
+    let nxt = get_dlmost_des(nd,nodes)
+    while(nxt !== null ) {
+        edfs.push(nxt)
+        nxt = get_edfs_next(nxt,nodes)
+    }
+    return(edfs)
 }
+
+//
 
 function get_sedfs(nd,nodes) {
 }
@@ -632,11 +808,11 @@ function get_deses(nd,nodes,including_self=false) {
     return(deses)
 }
 
-function get_fst_deses(nd,nodes) {
+function get_fst_lyr_deses(nd,nodes) {
     return(get_children(nd,nodes))
 }
 
-function get_lst_deses(nd,nodes) {
+function get_lst_lyr_deses(nd,nodes) {
     let deses = get_deses(nd,nodes,including_self=false)
     let des_depths = sdfs.map(r=>get_depth(r,nodes))
     let max = Math.max(...des_depths)
@@ -644,7 +820,7 @@ function get_lst_deses(nd,nodes) {
     return(deses)
 }
 
-function get_which_deses(which,nd,nodes) {
+function get_which_lyr_deses(which,nd,nodes) {
     let depth = get_depth(nd,nodes)
     let deses = get_deses(nd,nodes,including_self=false)
     let des_depths = sdfs.map(r=>get_depth(r,nodes))
@@ -661,113 +837,31 @@ function get_some_deses(nd,nodes,...whiches) {
 
 //
 
-const dflt_show_connd = {
-    't':'├── ',
-    'v':'│   ',
-    'l':'└── ',
-    'ws':'    '
-}
-
-function dflt_calc_conn_map_func(conn) {
-    let rslt;
-    if(conn==='t') {
-        rslt = 'v'
-    } else if(conn === 'v') {
-        rslt = 'v'
-    } else {
-        rslt = 'ws'
-    }
-    return(rslt)
-}
-
-
-function dflt_calc_conns(nd,nodes) {
-    nd._ui = {}
-    if(is_root(nd)){
-        nd._ui.conns = []
-    } else {
-        let parent = get_parent(nd,nodes)
-        let pconns = parent._ui.conns
-        let conns = pconns.map(conn=>dflt_calc_conn_map_func(conn))
-        let cond = is_lstch(nd)
-        if(cond) {
-            conns.push('l')
-        } else {
-            conns.push('t')
-        }
-        nd._ui.conns = conns
-    }
-    return(nd)
-}
-
-
-function conns2repr(conns) {
-    conns = conns.map(conn=>dflt_show_connd[conn])
-    return(conns.join(''))
-}
-
-
-function get_sdfs_repr_arr(nd,nodes,f){
-    let depth = get_depth(nd,nodes)
-    let sdfs = get_deses(nd,nodes,including_self=true)
-    sdfs = sdfs.map(nd=>dflt_calc_conns(nd,nodes))
-    let conns_array = sdfs.map(nd=>nd._ui.conns)
-    conns_array = conns_array.map(conns=>conns.slice(depth))
-    conns_array = conns_array.map(conns=>conns2repr(conns))
-    let arr = conns_array.map((conns,i)=>(conns+sdfs[i]._id))
-    return(arr)
-}
-
-function sdfs_show_all(nd,nodes,f=dflt_sdfs_show_callback){
-    let arr = get_sdfs_repr_arr(nd,nodes,f)
-    let repr = arr.join('\n')
-    console.log(repr)
-}
-
-
-function sdfs_show_from(nd,nodes,from){
-    let arr = get_sdfs_repr_arr(nd,nodes,f)
-    arr = arr.slice(from)
-    let repr = arr.join('\n')
-    console.log(repr)
-}
-
-function sdfs_show_to(nd,nodes,to){
-    let arr = get_sdfs_repr_arr(nd,nodes,f)
-    arr = arr.slice(0,to)
-    let repr = arr.join('\n')
-    console.log(repr)
-}
-
-function sdfs_show_from_to(nd,nodes,from,to){
-    let arr = get_sdfs_repr_arr(nd,nodes,f)
-    arr = arr.slice(from,to)
-    let repr = arr.join('\n')
-    console.log(repr)
-}
-//
-
 
 module.exports = {
+    //creat
     creat_root:creat_root,
     creat_nd:creat_nd,
+    //is
     is_inited:is_inited,
     is_root:is_root,
     is_fstch:is_fstch,
     is_lstch:is_lstch,
     is_leaf:is_leaf,
-    eq:eq,
+    //insert 
     prepend_child:prepend_child,
     append_child:append_child,
     insert_child:insert_child,
     add_rsib:add_rsib,
     add_lsib:add_lsib,
+    //child
     get_fstch:get_fstch,
     get_rsib:get_rsib,
     get_children:get_children,
     get_lstch:get_lstch,
     get_which_child:get_which_child,
-    get_some_child:get_some_child,
+    get_some_children:get_some_children,
+    //sib
     get_fstsib:get_fstsib,
     get_lstsib:get_lstsib,
     get_preceding_sibs:get_preceding_sibs,
@@ -778,111 +872,40 @@ module.exports = {
     get_sibseq:get_sibseq,
     get_lsib:get_lsib,
     get_rsib:get_rsib,
+    //mat
     get_lyr:get_lyr,
+    get_breadth:get_breadth,
     get_count:get_count,
+    get_depth:get_depth,
+    get_height:get_height,
+    get_fst_lyr_des_depth:get_fst_lyr_des_depth,
+    get_lst_lyr_des_depth:get_lst_lyr_des_depth,
+    get_which_lyr_des_depth:get_which_lyr_des_depth,
+    //ance
     get_root:get_root,
     get_parent:get_parent,
     get_ances:get_ances,
     get_which_ance:get_which_ance,
     get_some_ances:get_some_ances,
-    get_depth:get_depth,
-    get_height:get_height,
-    get_fst_des_depth:get_fst_des_depth,
-    get_lst_des_depth:get_lst_des_depth,
-    get_which_des_depth:get_which_des_depth,
+    //sdfs
     get_rsib_of_fst_ance_having_rsib:get_rsib_of_fst_ance_having_rsib,
     get_sdfs_next:get_sdfs_next,
     get_drmost_des:get_drmost_des,
     get_sdfs_prev:get_sdfs_prev,
     get_sdfs:get_sdfs,
-    ///
+    //edfs
+    get_lsib_of_fst_ance_having_lsib:get_lsib_of_fst_ance_having_lsib,
+    get_dlmost_des:get_dlmost_des,
+    get_edfs_next:get_edfs_next,
+    get_edfs_prev:get_edfs_prev,
+    get_edfs:get_edfs,
+    //
     get_deses:get_deses,
-    get_fst_deses:get_fst_deses,
-    get_lst_deses:get_lst_deses,
-    get_which_deses:get_which_deses,
+    get_fst_lyr_deses:get_fst_lyr_deses,
+    get_lst_lyr_deses:get_lst_lyr_deses,
+    get_which_lyr_deses:get_which_lyr_deses,
     get_some_deses:get_some_deses,
     //
-    dflt_show_connd,
-    dflt_calc_conn_map_func,
-    dflt_calc_conns,
-    conns2repr,
-    get_sdfs_repr_arr,
-    sdfs_show_all,
-    sdfs_show_from,
-    sdfs_show_to,
-    sdfs_show_from_to,
 }
 
 
-nodes = {}
-nd0 = creat_root()
-nodes[nd0._id] = nd0
-
-nd1 = creat_nd(nodes)
-prepend_child(nd0,nd1,nodes)
-
-
-nd2 = creat_nd(nodes)
-prepend_child(nd1,nd2,nodes)
-
-nd3 = creat_nd(nodes)
-add_rsib(nd2,nd3,nodes)
-
-nd4 = creat_nd(nodes)
-prepend_child(nd3,nd4,nodes)
-
-nd5 = creat_nd(nodes)
-add_rsib(nd4,nd5,nodes)
-
-
-nd6 = creat_nd(nodes)
-add_rsib(nd1,nd6,nodes)
-
-nd7 = creat_nd(nodes)
-prepend_child(nd6,nd7,nodes)
-
-nd8 = creat_nd(nodes)
-add_rsib(nd7,nd8,nodes)
-
-nd9 = creat_nd(nodes)
-add_rsib(nd8,nd9,nodes)
-
-
-nd10 = creat_nd(nodes)
-append_child(nd9,nd10,nodes)
-
-nd11 = creat_nd(nodes)
-append_child(nd9,nd11,nodes)
-
-nd12 = creat_nd(nodes)
-append_child(nd9,nd12,nodes)
-
-nd1013 = creat_nd(nodes,1000)
-add_lsib(nd12,nd1013,nodes)
-
-nd1014 = creat_nd(nodes)
-add_lsib(nd10,nd1014,nodes)
-
-nd1015 = creat_nd(nodes)
-insert_child(1,nd9,nd1015,nodes)
-
-/*
-    nd0:creat-root
-        nd1: nd0-prepend-child
-            nd2: nd1-prepend-child
-            nd3: nd2-add-rsib
-                nd4: nd3-prepend-child
-                nd5: nd4-add-rsib
-        nd6: nd1-add-rsib
-           nd7:nd6-prepend-child
-           nd8:nd7-add-rsib
-           nd9:nd8-add-rsib
-               nd10:
-               nd11:
-               nd12:
-*/
-
-
-//
-child = get_which_child(1,root,nodes)
-lstrsib = get_lstsib(child,nodes)

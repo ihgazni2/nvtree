@@ -1,8 +1,6 @@
 const nd = "./nd.js"
 
 
-
-
 function is_inited(id,nodes) {
     let nd = nodes[id]
     return(nd.is_inited(nd))
