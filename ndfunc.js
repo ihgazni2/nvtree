@@ -3,8 +3,12 @@ const cmmn = require("./cmmn.js")
 //util
 
 function calc_next_id(nodes) {
-    let ids = cmmn.dict_keys(nodes)
-    return(Math.max(...ids)+1)
+    if(cmmn.is_empty_dict(nodes)){
+        return(0)
+    } else {
+        let ids = cmmn.dict_keys(nodes)
+        return(Math.max(...ids)+1)
+    }
 }
 
 function update_nodes_ids(nodes0,nodes1) {
@@ -845,7 +849,6 @@ function nd2ele(nd,nodes) {
 }
 
 
-}
 
 
 function _nd2unhandled_ele(nd) {
@@ -966,6 +969,9 @@ function get_some_deses(nd,nodes,...whiches) {
 
 
 module.exports = {
+    //
+    calc_next_id,
+    update_nodes_ids,
     //creat
     creat_root:creat_root,
     creat_nd:creat_nd,

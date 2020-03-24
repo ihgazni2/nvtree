@@ -21,6 +21,15 @@ function seqs_slct(seqs,arr) {
     return(arr.filter((r,i)=>(seqs.includes(i))))
 }
 
+
+function dict_length(d) {
+    return(Object.entries(d).length)
+}
+
+function is_empty_dict(d) {
+    return(Object.entries(d).length === 0)
+}
+
 function dict_values(d) {
     let entries = Object.entries(d)
     let values = entries.map(r=>r[1])
@@ -72,6 +81,8 @@ module.exports = {
     gen_guid:gen_guid,
     range:range,
     seqs_slct:seqs_slct,
+    dict_length:dict_length,
+    is_empty_dict:is_empty_dict,
     dict_values:dict_values,
     dict_keys:dict_keys,
     dict_map:dict_map,
