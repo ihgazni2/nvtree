@@ -834,46 +834,94 @@ function get_sedfs(nd,nodes,deepcopy=false,clear=true) {
 
 //
 
-function get_mat(nd,nodes) {
+function nd2ele(nd,nodes) {
+    let ele = {}
+    ele._depth = get_depth(nd,nodes)
+    ele._breadth = get_breadth(nd,nodes) 
+    let p = get_parent(nd,nodes)
+    ele._pbreadth = (p===null)? null : get_breadth(p,nodes) 
+    ele._id = nd._id
+    return(ele)
 }
 
-function mat2sdfs(mat,nodes) {
+
 }
 
-function mat2edfs(mat,nodes) {
-    
-}
 
-function mat2sedfs(mat,nodes) {
+function _nd2unhandled_ele(nd) {
+    let o = {}
+    o.ele = {}
+    o.nd = nd
+    o.ele._id = nd._id
+    o.ele._children = []
+    return(o) 
 }
 
 function sdfs2mat(sdfs,nodes) {
+    let m = []
+    let nd = sdfs[0]
+    let unhandled = [_nd2unhandled_ele(nd)]
+    unhandled[0].ele._pbreadth = null
+    while(unhandled.length>0){
+        let next_unhandled = []
+        for(let i=0;i<unhandled.length;i++) {
+            unhandled[i].ele._breadth = i
+            unhandled[i].ele._depth = m.length
+            let children = get_children(unhandled[i].nd,nodes)
+            children = children.map(nd=>_nd2unhandled_ele(nd))
+            children.forEach(
+                (r,index)=>{
+                    r.ele._pbreadth = unhandled[i].ele._breadth
+                    unhandled[i].ele._children.push([(m.length+1),next_unhandled.length+index])
+                }
+            )
+            next_unhandled = next_unhandled.concat(children)
+        }
+        let lyr = unhandled.map(r=>r.ele)
+        m.push(lyr)
+        unhandled = next_unhandled
+    }   
+    return(m)        
 }
 
-function sdfs2edfs(mat,nodes) {
+function sdfs2edfs(sdfs,nodes) {
+    return(get_edfs(sdfs[0],nodes))
 }
 
-function sdfs2sedfs(mat,nodes) {
+function sdfs2sedfs(sdfs,nodes,deepcopy=false,clear=true) {
+    return(get_sedfs(sdfs[0],nodes,deepcopy,clear))
 }
 
-function edfs2mat(sdfs,nodes) {
+function edfs2mat(edfs,nodes) {
+    let sdfs = edfs2sdfs(edfs,nodes)
+    let m = sdfs2mat(sdfs,nodes)
+    return(m)
 }
 
-function edfs2sdfs(mat,nodes) {
+function edfs2sdfs(edfs,nodes) {
+    let nd = edfs[edfs.length-1]
+    return(get_sdfs(nd,nodes))
 }
 
-function edfs2sedfs(mat,nodes) {
+function edfs2sedfs(edfs,nodes,deepcopy=false,clear=true) {
+    let sdfs = edfs2sdfs(edfs,nodes)
+    return(sdfs2sedfs(sdfs,nodes,deepcopy,clear)) 
 }
 
-function sedfs2mat(sdfs,nodes) {
+function sedfs2mat(sedfs,nodes) {
+    let sdfs = sedfs2sdfs(sedfs,nodes)
+    return(sdfs2mat(sdfs,nodes))
 }        
 
-function sedfs2sdfs(mat,nodes) {
+function sedfs2sdfs(sedfs,nodes) {
+    let nd = sedfs[0]
+    return(get_sdfs(nd,nodes))
 }        
 
-function sedfs2edfs(mat,nodes) {
+function sedfs2edfs(sedfs,nodes) {
+    let sdfs = sedfs2sdfs(sedfs,nodes)
+    return(sdfs2edfs(sdfs,nodes))
 }
-
 
 
 //
@@ -984,13 +1032,24 @@ module.exports = {
     is_sedfs_traverse_finished:is_sedfs_traverse_finished,
     get_sedfs_prev:get_sedfs_prev,    
     get_sedfs:get_sedfs,
-    //
+    //des
     get_deses:get_deses,
     get_fst_lyr_deses:get_fst_lyr_deses,
     get_lst_lyr_deses:get_lst_lyr_deses,
     get_which_lyr_deses:get_which_lyr_deses,
     get_some_deses:get_some_deses,
+    //mat
+    nd2ele:nd2ele,
+    sdfs2mat:sdfs2mat,
     //
+    sdfs2edfs:sdfs2edfs,
+    sdfs2sedfs:sdfs2sedfs,
+    edfs2mat:edfs2mat,
+    edfs2sdfs:edfs2sdfs,
+    edfs2sedfs:edfs2sedfs,
+    sedfs2mat:sedfs2mat,
+    sedfs2sdfs:sedfs2sdfs,
+    sedfs2edfs:sedfs2edfs,
 }
 
 

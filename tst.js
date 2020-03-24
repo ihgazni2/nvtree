@@ -1,5 +1,5 @@
 var ndfunc = require("./ndfunc.js")
-var term = require("./term.js")
+var term = require("./ndterm.js")
 
 var sh = term.sdfs_show_root_tree
 // nodes 是tree 里记录所有节点的结构
