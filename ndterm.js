@@ -50,6 +50,7 @@ function dflt_sdfs_calc_conns(nd,nodes) {
     if(ndfunc.is_root(nd)){
         //跟节点没有前导ui 符号
         nd._ui.conns = []
+        nd._ui.display = true
     } else {
         let parent = ndfunc.get_parent(nd,nodes)
         //获取父节点的前导ui 符号序列数组
@@ -97,7 +98,7 @@ function sdfs_show_all(nd,nodes,f=dflt_sdfs_show_callback){
 
 function sdfs_show_root_tree(nodes,f=dflt_sdfs_show_callback){
     let k = cmmn.dict_keys(nodes)[0]
-    let nd = ndfunc.get_root(nodes[0],nodes)
+    let nd = ndfunc.get_root(nodes[k],nodes)
     let arr = get_sdfs_repr_arr(nd,nodes,f)
     let repr = arr.join('\n')
     console.log(repr)
@@ -193,7 +194,7 @@ function edfs_show_all(nd,nodes,f=dflt_edfs_show_callback){
 
 function edfs_show_root_tree(nodes,f=dflt_edfs_show_callback){
     let k = cmmn.dict_keys(nodes)[0]
-    let nd = ndfunc.get_root(nodes[0],nodes)
+    let nd = ndfunc.get_root(nodes[k],nodes)
     let arr = get_edfs_repr_arr(nd,nodes,f)
     let repr = arr.join('\n')
     console.log(repr)

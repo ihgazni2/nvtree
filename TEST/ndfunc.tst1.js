@@ -1,5 +1,5 @@
-var ndfunc = require("./ndfunc.js")
-var term = require("./term.js")
+var ndfunc = require("../ndfunc.js")
+var term = require("../ndterm.js")
 var sh = term.sdfs_show_root_tree
 nodes = {}
 
@@ -38,6 +38,51 @@ function fill_nodes(nodes) {
     ndfunc.insert_child(1,nd9,nd1015,nodes)
 }
 
+function tst_disconnect() {
+    var nodes = {}
+    fill_nodes(nodes)
+    var arr = ndfunc.disconnect(nodes[0],nodes) 
+    var nd = arr[0]
+    var nnodes = arr[1]  
+    sh(nnodes)
+    nnodes === nodes
+    sh(nodes)
+    var arr = ndfunc.disconnect(nodes[12],nodes)
+    var nd = arr[0] 
+    var nnodes = arr[1] 
+    sh(nnodes)
+    sh(nodes)
+    var arr = ndfunc.disconnect(nodes[7],nodes)
+    var nd = arr[0]
+    var nnodes = arr[1]
+    sh(nnodes)
+    sh(nodes)
+    var arr = ndfunc.disconnect(nodes[10],nodes)
+    var nd = arr[0]
+    var nnodes = arr[1]
+    sh(nnodes)
+    sh(nodes)
+    var arr = ndfunc.disconnect(nodes[3],nodes)
+    var nd = arr[0]
+    var nnodes = arr[1]
+    sh(nnodes)
+    sh(nodes)
+    //
+    var arr = ndfunc.disconnect(nodes[6],nodes)
+    var nd = arr[0]
+    var nnodes = arr[1]
+    sh(nnodes)
+    sh(nodes)
+    //
+    var arr = ndfunc.disconnect(nodes[2],nodes)
+    var nd = arr[0]
+    var nnodes = arr[1]
+    sh(nnodes)
+    sh(nodes)
+}
+
+
 module.exports = {
-    fill_nodes
+    fill_nodes,
+    tst_disconnect,
 }

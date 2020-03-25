@@ -85,6 +85,17 @@ function is_leaf(nd) {
     return(cond)
 }
 
+function is_lonely(nd,nodes) {
+    let cond = is_root(nd)
+    if(cond) {
+        return(true)
+    } else {
+        let parent = get_parent(nd,nodes)
+        let children = get_children(parent,nodes)
+        return(children.length === 1)  
+    } 
+}
+
 /*
 function eq(nd0,nd1) {
     //id 必须完全一致
@@ -210,8 +221,107 @@ function insert_child(which,nd,child,nodes) {
 }
 
 /**/
+
+function update_disconnected_nodes(nd,nodes) {
+    let nsdfs = get_sdfs(nd,nodes)
+    let treeid = nsdfs[0]._id
+    nsdfs.forEach(
+       nd=> {
+           nd._tree =treeid 
+       }
+    ) 
+    return(nsdfs)
+}
+
+function update_orig_nodes(nsdfs,nodes) {
+    let nnodes = {}
+    nsdfs.map(
+        nd => {
+            let id = nd._id
+            nnodes[id] = nd
+            delete nodes[id]
+        }
+    )
+    return(nnodes)  
+}
+
+
+function leafize(nd) {
+    nd._fstch = null
+    nd._lsib = null
+    nd._rsib = null
+    return(nd)
+}
+
+function rootize(nd) {
+    nd._lsib = null
+    nd._rsib = null
+    nd._parent = null
+    return(nd) 
+}
+
+
 function disconnect(nd,nodes) {
-    //操作自己
+    let cond = is_root(nd)
+    if(cond) {
+        //do nothing
+        return([nd,nodes])
+    } else if(is_lonely(nd,nodes)) {
+        //
+        let parent =  nodes[nd._parent]
+        leafize(parent);
+        let nsdfs = update_disconnected_nodes(nd,nodes);
+        let nnodes = update_orig_nodes(nsdfs,nodes)
+        rootize(nd);
+        //
+        return([nd,nnodes])         
+    } else {
+        if(is_fstch(nd)) {
+            //节点变味新树的根节点
+            let rsib = get_rsib(nd,nodes)
+            //右兄弟变成了fstch, lsib 指向null
+            rsib._lsib = null
+            //右兄弟变成了fstch,parent要指向rsib
+            rsib._parent = nd._parent
+            // parent 的fstch 要指向rsib
+            let parent = get_parent(nd,nodes) 
+            parent._fstch = nd._rsib  
+            //后代节点关系不变，但是tree变为当前节点._id
+            let nsdfs = update_disconnected_nodes(nd,nodes)
+            //从原来的nodes删除分离出的子树的所有节点
+            let nnodes = update_orig_nodes(nsdfs,nodes)
+            //nd 变为分离出去的tree的root
+            rootize(nd);
+            //
+            return([nd,nnodes])             
+        } else if(is_lstch(nd)) {
+            //节点变味新树的根节点
+            let lsib = get_lsib(nd,nodes) 
+            lsib._rsib = nd._rsib
+            //左兄弟变成了lstch,左邻居要指向parent
+            lsib._parent = nd._parent
+            //后代节点关系不变，但是tree变为当前节点._id
+            let nsdfs = update_disconnected_nodes(nd,nodes) 
+            //从原来的nodes删除分离出的子树的所有节点
+            let nnodes = update_orig_nodes(nsdfs,nodes)
+            //nd 变为分离出去的tree的root
+            rootize(nd);
+            //
+            return([nd,nnodes])
+        } else {
+            //节点变味新树的根节点
+            let lsib = get_lsib(nd,nodes) 
+            lsib._rsib = nd._rsib
+            //后代节点关系不变，但是tree变为当前节点._id
+            let nsdfs = update_disconnected_nodes(nd,nodes)
+            //从原来的nodes删除分离出的子树的所有节点
+            let nnodes = update_orig_nodes(nsdfs,nodes)
+            //nd 变为分离出去的tree的root
+            rootize(nd);
+            //
+            return([nd,nnodes])
+        }
+    }   
 }
 
 //在父节点上操作
@@ -981,6 +1091,7 @@ module.exports = {
     is_fstch:is_fstch,
     is_lstch:is_lstch,
     is_leaf:is_leaf,
+    is_lonely:is_lonely,
     //insert 
     prepend_child:prepend_child,
     append_child:append_child,
@@ -1056,6 +1167,12 @@ module.exports = {
     sedfs2mat:sedfs2mat,
     sedfs2sdfs:sedfs2sdfs,
     sedfs2edfs:sedfs2edfs,
+    //
+    update_disconnected_nodes,
+    update_orig_nodes,
+    leafize,
+    rootize,
+    disconnect,
 }
 
 
