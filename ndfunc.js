@@ -11,10 +11,33 @@ function calc_next_id(nodes) {
     }
 }
 
+function is_id(n) {
+    let cond = (n !== null) and (n !== undefined)
+    return(cond) 
+}
+
+function update_one_nodeid(nd,idplus) {
+    nd._id = nd._id + idplus
+    nd._tree = nd._tree + idplus
+    if(is_id(nd._fstch)) {
+         nd._fstch = nd._fstch + idplus
+    }
+    if(is_id(nd._lstch)) {
+         nd._lstch = nd._lstch + idplus
+    }
+    if(is_id(nd._parent)) {
+         nd._parent = nd._parent + idplus    
+    } 
+    return(nd)        
+}
+
+
 function update_nodes_ids(nodes0,nodes1) {
     let next_id = calc_next_id(nodes0)
     for(let id in nodes1) {
-        nodes1[id]._id = nodes1[id]._id + next_id
+        let nnd = update_one_nodeid(nodes1[id],next_id) 
+        nodes1[nnd._id] = nnd
+        delete nodes1[id]
     }
     return(nodes1)
 }
@@ -220,7 +243,44 @@ function insert_child(which,nd,child,nodes) {
     }
 }
 
-/**/
+/*tree*/
+
+function prepend_child_tree(nd,nodes,cnodes) {
+    cnodes = update_nodes_ids(nodes,cnodes)
+    let child = get_root(cnodes[0],cnodes)
+    return(prepend_child(nd,child,nodes)) 
+}
+
+function append_child_tree(nd,nodes,cnodes) {
+    cnodes = update_nodes_ids(nodes,cnodes)
+    let child = get_root(cnodes[0],cnodes)
+    return(append_child(nd,child,nodes)) 
+}
+
+function add_rsib_tree(nd,nodes,cnodes) {
+    cnodes = update_nodes_ids(nodes,cnodes)
+    let child = get_root(cnodes[0],cnodes)
+    return(add_rsib(nd,child,nodes))
+}
+
+function add_lsib_tree(nd,nodes,cnodes) {
+    cnodes = update_nodes_ids(nodes,cnodes)
+    let child = get_root(cnodes[0],cnodes)
+    return(add_lsib(nd,child,nodes))
+}
+
+function insert_child_tree(which,nd,nodes,cnodes) {
+    cnodes = update_nodes_ids(nodes,cnodes)
+    let child = get_root(cnodes[0],cnodes)
+    return(insert_child(which,nd,child,nodes))
+}
+
+
+
+
+
+
+/*tree*/
 
 function update_disconnected_nodes(nd,nodes) {
     let nsdfs = get_sdfs(nd,nodes)
@@ -326,20 +386,47 @@ function disconnect(nd,nodes) {
 
 //在父节点上操作
 function rm_fstch(nd,nodes) {
+    let fstch = get_fstch(nd,nodes)
+    if(fstch===null) {
+        return([nd,nodes])
+    } else {
+        return(disconnect(fstch,nodes))
+    }
 }
 
 function rm_lstch(nd,nodes) {
+    let lstch = get_lstch(nd,nodes)
+    if(lstch===null) {
+        return([nd,nodes])
+    } else {
+        return(disconnect(lstch,nodes))
+    }
 }
 
 function rm_which(index,nd,nodes) {
+    let child = get_which_child(index,nd,nodes)
+    if(child===null) {
+        return([nd,nodes])
+    } else {
+        return(disconnect(child,nodes))
+    }     
 }
 
-function rm_some(indexes,nd,nodes) {
+function rm_some(nd,nodes,...whices) {
+    let some = get_some_children(nd,nodes,...whiches) 
+    for(let i=0;i<some.length;i++) {
+        disconnect(some[i],nodes)
+    }
+    return([nd,nodes])
 }
 
 function rm_all(nd,nodes) {
+    let children = get_children(nd,nodes)
+    for(let i=0;i<children.length;i++) {
+        disconnect(children[i],nodes)
+    }
+    return(nodes)
 }
-
 
 /**/
 
@@ -1092,6 +1179,7 @@ module.exports = {
     is_lstch:is_lstch,
     is_leaf:is_leaf,
     is_lonely:is_lonely,
+    is_id:is_id,
     //insert 
     prepend_child:prepend_child,
     append_child:append_child,
@@ -1173,6 +1261,19 @@ module.exports = {
     leafize,
     rootize,
     disconnect,
+    rm_fstch,
+    rm_lstch,
+    rm_which,
+    rm_some,
+    rm_all,
+    //
+    update_one_nodeid,
+    update_nodes_ids,
+    prepend_child_tree,
+    append_child_tree,
+    add_rsib_tree,
+    add_lsib_tree,
+    insert_child_tree,
 }
 
 
