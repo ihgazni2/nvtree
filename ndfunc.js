@@ -529,7 +529,11 @@ function get_lstsib(nd,nodes,including_self=false) {
     if(including_self){
         return(lstrsib)
     } else {
-        return(null)
+        if(lstrsib._id !== nd._id) {
+            return(lstrsib)
+        } else {
+            return(null)
+        }
     }
 }
 
