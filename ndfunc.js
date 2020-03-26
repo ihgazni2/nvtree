@@ -12,7 +12,7 @@ function calc_next_id(nodes) {
 }
 
 function is_id(n) {
-    let cond = (n !== null) and (n !== undefined)
+    let cond = ((n !== null) && (n !== undefined))
     return(cond) 
 }
 
@@ -22,8 +22,11 @@ function update_one_nodeid(nd,idplus) {
     if(is_id(nd._fstch)) {
          nd._fstch = nd._fstch + idplus
     }
-    if(is_id(nd._lstch)) {
-         nd._lstch = nd._lstch + idplus
+    if(is_id(nd._lsib)) {
+         nd._lsib = nd._lsib + idplus
+    }
+    if(is_id(nd._rsib)) {
+         nd._rsib = nd._rsib + idplus
     }
     if(is_id(nd._parent)) {
          nd._parent = nd._parent + idplus    
@@ -243,41 +246,65 @@ function insert_child(which,nd,child,nodes) {
     }
 }
 
+
+function update_treeid(nd,cnodes) {
+    for(let id in cnodes) {
+        cnodes[id]._tree = nd._tree
+    }
+}
+
+
 /*tree*/
 
 function prepend_child_tree(nd,nodes,cnodes) {
     cnodes = update_nodes_ids(nodes,cnodes)
-    let child = get_root(cnodes[0],cnodes)
-    return(prepend_child(nd,child,nodes)) 
+    let k = cmmn.dict_keys(cnodes)[0]
+    let child = get_root(cnodes[k],cnodes)
+    nd = prepend_child(nd,child,nodes) 
+    update_treeid(nd,cnodes)
+    cmmn.dict_plus(nodes,cnodes)
+    return(nd)
 }
 
 function append_child_tree(nd,nodes,cnodes) {
     cnodes = update_nodes_ids(nodes,cnodes)
-    let child = get_root(cnodes[0],cnodes)
-    return(append_child(nd,child,nodes)) 
+    let k = cmmn.dict_keys(cnodes)[0]
+    let child = get_root(cnodes[k],cnodes)
+    nd = append_child(nd,child,nodes) 
+    update_treeid(nd,cnodes)
+    cmmn.dict_plus(nodes,cnodes)
+    return(nd)
 }
 
 function add_rsib_tree(nd,nodes,cnodes) {
     cnodes = update_nodes_ids(nodes,cnodes)
-    let child = get_root(cnodes[0],cnodes)
-    return(add_rsib(nd,child,nodes))
+    let k = cmmn.dict_keys(cnodes)[0]
+    let child = get_root(cnodes[k],cnodes)
+    nd = add_rsib(nd,child,nodes) 
+    update_treeid(nd,cnodes)
+    cmmn.dict_plus(nodes,cnodes)
+    return(nd)
 }
 
 function add_lsib_tree(nd,nodes,cnodes) {
     cnodes = update_nodes_ids(nodes,cnodes)
-    let child = get_root(cnodes[0],cnodes)
-    return(add_lsib(nd,child,nodes))
+    let k = cmmn.dict_keys(cnodes)[0]
+    let child = get_root(cnodes[k],cnodes)
+    nd = add_lsib(nd,child,nodes) 
+    update_treeid(nd,cnodes)
+    cmmn.dict_plus(nodes,cnodes)
+    return(nd)
 }
 
 function insert_child_tree(which,nd,nodes,cnodes) {
     cnodes = update_nodes_ids(nodes,cnodes)
-    let child = get_root(cnodes[0],cnodes)
-    return(insert_child(which,nd,child,nodes))
+    let k = cmmn.dict_keys(cnodes)[0]
+    let child = get_root(cnodes[k],cnodes)
+    nd = insert_child(which,nd,child,nodes) 
+    update_treeid(nd,cnodes)
+    cmmn.dict_plus(nodes,cnodes)
+    return(nd)
 }
-
-
-
-
 
 
 /*tree*/
@@ -1267,6 +1294,7 @@ module.exports = {
     rm_some,
     rm_all,
     //
+    update_treeid,
     update_one_nodeid,
     update_nodes_ids,
     prepend_child_tree,

@@ -1,7 +1,6 @@
 var ndfunc = require("../ndfunc.js")
 var term = require("../ndterm.js")
 var sh = term.sdfs_show_root_tree
-nodes = {}
 
 function fill_nodes(nodes) {
     nd0 = ndfunc.creat_root()
@@ -81,8 +80,64 @@ function tst_disconnect() {
     sh(nodes)
 }
 
+    //var fill_nodes = require('./ndfunc.tst1.js').fill_nodes
+function tst_tree() {
+    //prepend-at-leaf
+    nodes = {}
+    fill_nodes(nodes)
+    nd = nodes[12]
+    cnodes = {}
+    fill_nodes(cnodes)
+    sh(nodes)
+    sh(cnodes) 
+    ndfunc.prepend_child_tree(nd,nodes,cnodes) 
+    sh(nodes) 
+    //prepend-at-nonleaf
+    nodes = {}
+    fill_nodes(nodes)
+    nd = nodes[6]
+    cnodes = {}
+    fill_nodes(cnodes)
+    sh(nodes)
+    sh(cnodes)
+    ndfunc.prepend_child_tree(nd,nodes,cnodes)
+    sh(nodes)  
+    //append-at-leaf 
+    nodes = {}
+    fill_nodes(nodes)
+    nd = nodes[8]
+    cnodes = {}
+    fill_nodes(cnodes)
+    sh(nodes)
+    sh(cnodes) 
+    ndfunc.append_child_tree(nd,nodes,cnodes)
+    sh(nodes)
+    //append-at-nonleaf
+    nodes = {}
+    fill_nodes(nodes)
+    nd = nodes[6]
+    cnodes = {}
+    fill_nodes(cnodes)
+    sh(nodes)
+    sh(cnodes) 
+    ndfunc.append_child_tree(nd,nodes,cnodes)
+    sh(nodes)  
+    //insert
+    nodes = {}
+    fill_nodes(nodes)
+    nd = nodes[6]
+    cnodes = {}
+    fill_nodes(cnodes)
+    sh(nodes)
+    sh(cnodes)
+    ndfunc.insert_child_tree(2,nd,nodes,cnodes)
+    sh(nodes) 
+     
+ 
+}
 
 module.exports = {
     fill_nodes,
     tst_disconnect,
+    tst_tree,
 }

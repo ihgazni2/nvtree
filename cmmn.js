@@ -61,6 +61,14 @@ function dict_map(d,f) {
     return(d)
 }
 
+function dict_plus(d0,d1) {
+    //unique k ,no common k
+    for(let k in d1) {
+        d0[k] =d1[k]
+    }
+    return(d0)    
+}
+
 
 function dtb_kv_rm(k,v,dtb) {
     dtb = dtb.filter(r=>(r[k]!==v))
@@ -88,6 +96,7 @@ module.exports = {
     dict_map:dict_map,
     dict_foreach:dict_foreach,
     dict_length:dict_length,
+    dict_plus,
     dtb_kv_rm,
     dtb_kv_get_seq,
     dcp:dcp,
