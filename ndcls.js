@@ -32,6 +32,13 @@ function _is_leaf(nd) {
     return(cond)
 }
 
+
+function _is_lonely(nd) {
+    let sibs = nd.$sibs(including_self=true)
+    return(sibs.length === 1)
+}
+
+
 /* child query*/
 
 //_fstch is always directly
@@ -175,7 +182,7 @@ function _psibs(nd) {
     let psibs = []
     let fstsib = _fstsib(nd,including_self=true)
     let sib = fstsib
-    while(sib !=== null) {
+    while(sib !== null) {
         if(sib === nd) {
             return(psibs)           
         } else {
@@ -209,12 +216,104 @@ function _sibs(nd,including_self=false) {
 }
 
 
+function _which_sib(index,nd) {
+    let sib = _fstsib(nd,including_self=true)
+    let c = 0
+    while(true) {
+        if(sib === null) {
+            return(null)
+        } else {
+            if(c==index) {
+                return(sib)
+            }
+        }
+        sib = sib._rsib
+        c = c + 1
+    }    
+}
+
+function _some_sibs(nd,...indexes) {
+    let sibs = _sibs(nd,including_self=true) 
+    let some = sibs.filter(
+        (r,i) => indexes.includes(i) 
+    )
+    return(some)   
+}
+
+
+function _sibseq(nd) {
+    let psibs = _psibs(nd)
+    return(psibs.length)
+}
+
+
+function _sibs_count(nd,including_self=false) {
+    let sibs = nd.$sibs(including_self)
+    return(sibs.length)
+}
+
+
+
+
 /*ance*/
 
 function _parent(nd) {
     let lstsib = _lstsib(nd,including_self=true)
     return(lstsib._parent)
 }
+
+function _root(nd) {
+    let ance = nd
+    let old = nd
+    while(ance !== null) {
+        old = ance
+        ance = ance.$parent()
+    }
+    return(ance)    
+}
+
+function _which_ance(index,nd) {
+    let c = 0
+    let ance = nd
+    while(ance !== null) {
+        if(c === index) {
+            return(ance)
+        } else {
+        }
+        ance = ance.$parent()
+        c = c+1
+    }
+    return(null)
+}
+
+function _ances(nd,including_self=false) {
+    let ances = []
+    let ance = nd
+    if(including_self) {
+        ances.push(ance)
+    } else {
+    } 
+    ance = ance.$parent()
+    while(ance !== null)  {
+        ances.push(ance)
+        ance = ance.$parent()
+    }
+    return(ances) 
+}
+
+function _some_ances(nd,...indexes) {
+    let ances = _ances(nd,including_self=true)
+    let some = ances.filter(
+        (r,i) => indexes.includes(i)
+    )
+    return(some)      
+}
+
+function _ances_count(nd,including_self=false) {
+    let ances = _ances(nd,including_self)
+    return(ances.length)
+}
+
 
 /**/
 
@@ -305,6 +404,30 @@ function _add_lsib(nd,lsib) {
 }
 
 
+function _insert_child(which,nd,child) {
+    let children = nd.$children()
+    let lngth = children.length
+    if(lngth ===0) {
+        nd.$prepend_child(nd,child)
+    } else {
+        let cond = (which<=lngth) && (which >=0)
+        if(!cond) {
+            console.log("not in range!!")
+            return(nd)
+        } else {
+            if(which === 0) {
+                nd.$prepend_child(nd,child)
+            } else if(which === lngth) {
+                nd.$append_child(nd,child)
+            } else {
+                let lnd = children[which-1]
+                lnd.$add_rsib(child)
+            }   
+        }   
+    }   
+}   
+
+
 
 
 /**/
@@ -340,6 +463,9 @@ class _Node {
     }   
     $is_leaf() {
         return(_is_leaf(this))
+    }
+    $is_lonly() {
+        return(_is_lonely(this))
     }
     //child
     $fstch() {
@@ -379,17 +505,48 @@ class _Node {
     $fsibs() {
         return(_fsibs(this))
     }
+    $which_sib(index) {
+        return(_which_sib(index,this))
+    }
+    $some_sibs(...indexes) {
+        return(_some_sibs(this,...indexes))
+    }
+    $sibseq() {
+        return(_sibseq(this))
+    }
     $sibs(including_self=false) {
         return(_sibs(this,including_self))
+    }
+    $sibs_count(including_self=false) {
+        return(_sibs_count(this,including_self))
     } 
     //
     $parent() {
         return(_parent(this))
-    }  
+    } 
+    $root() {
+        return(_root(this))
+    } 
+    $ances(including_self=false) {
+        return(_ances(this,including_self))
+    }
+    $which_ance(index) {
+        return(_which_ance(index,this))
+    }
+    $some_ances(...indexes) {
+        return(_some_ances(this,...indexes))
+    }
+    $ances_count(including_self=false) {
+        return(_ances_count(this,including_self))
+    }
     //
     $prepend_child(child) {
         child = (child===undefined)?(new _Node()):child
         _prepend_child(this,child)       
+    }
+    $insert_child(which,child) {
+        child = (child===undefined)?(new _Node()):child
+        _insert_child(which,this,child)
     }
     $append_child(child)  {
         child = (child===undefined)?(new _Node()):child
@@ -434,6 +591,8 @@ rt.$prepend_child()
 rt.$prepend_child()
 rt.$prepend_child()
 
+
+
 assert.strictEqual(rt.$children_count(),6)
 rt.$fstch().$guid
 rt.$lstch().$guid
@@ -442,7 +601,49 @@ rt.$children().map(nd=>nd.$guid)
 rt.$some_children(0,2,4).map(nd=>nd.$guid)
 
 
+assert.strictEqual(rt.$rsib(),null);
+assert.strictEqual(rt.$lsib(),null);
+rt.$fstsib()
+rt.$lstsib()
+rt.$psibs()
+rt.$fsibs()
+rt.$sibs()
+rt.$which_sib(0).$guid === rt.$guid
 
+var nd = rt.$which_child(2)
+assert.strictEqual(nd.$fstsib(),rt.$fstch());
+nd.$lstsib().$guid
+nd.$which_sib(0).$guid
+nd.$psibs().map(nd=>nd.$guid)
+nd.$fsibs().map(nd=>nd.$guid)
+nd.$sibs(including_self=true).map(nd=>nd.$guid)
+nd.$which_sib(3).$guid
+nd.$sibseq()
+nd.$some_sibs(1,3).map(nd=>nd.$guid)
+nd.$guid
+nd.$add_lsib()
+nd.$sibs(including_self=true).map(nd=>nd.$guid)
+nd.$add_rsib()
+nd.$sibs(including_self=true).map(nd=>nd.$guid)
+
+
+rt.$insert_child(3)
+nd.$sibs(including_self=true).map(nd=>nd.$guid);
+
+
+assert.strictEqual(rt,nd.$parent());
+
+
+nd.$append_child()
+nd.$append_child()
+
+
+nd = rt.$which_child(3)
+nd.$append_child()
+nd.$append_child()
+
+
+nd = nd.$fstch()
 
 */
 

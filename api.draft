@@ -2,11 +2,7 @@ function calc_next_id(nodes) {
 function is_id(n) {
 function update_one_nodeid(nd,idplus) {
 function update_nodes_ids(nodes0,nodes1) {
-function is_lonely(nd,nodes) {
-function eq(nd0,nd1) {
-function insert_child(which,nd,child,nodes) {
 function update_treeid(nd,cnodes) {
-function insert_child_tree(which,nd,nodes,cnodes) {
 function update_disconnected_nodes(nd,nodes) {
 function update_orig_nodes(nsdfs,nodes) {
 function leafize(nd) {
@@ -17,9 +13,6 @@ function rm_lstch(nd,nodes) {
 function rm_which(index,nd,nodes) {
 function rm_some(nd,nodes,...whices) {
 function rm_all(nd,nodes) {
-function get_which_sib(which,nd,nodes) {
-function get_some_sibs(nd,nodes,...whiches) {
-function get_sibseq(nd,nodes) {
 function get_depth(nd,nodes) {
 function get_height(nd,nodes) {
 function get_fst_lyr_des_depth(nd,nodes) {
@@ -28,16 +21,13 @@ function get_which_lyr_des_depth(which,nd,nodes) {
 function get_lyr(nd,nodes) {
 function get_breadth(nd,nodes) {
 function get_count(nd,nodes) {
-function get_root(nd,nodes) {
-function get_parent(nd,nodes) {
-function get_ances(nd,nodes,including_self=false) {
-function get_which_ance(which,nd,nodes) {
-function get_some_ances(nd,nodes,...whiches) {
+
 function get_rsib_of_fst_ance_having_rsib(nd,nodes) {
 function get_sdfs_next(nd,nodes) {
 function get_drmost_des(nd,nodes){
 function get_sdfs_prev(nd,nodes) {
 function get_sdfs(nd,nodes) {
+
 function get_dlmost_des(nd,nodes) {
 function get_edfs_next(nd,nodes) {
 function get_lsib_of_fst_ance_having_lsib(nd,nodes) {
