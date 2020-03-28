@@ -13,26 +13,17 @@ function rm_lstch(nd,nodes) {
 function rm_which(index,nd,nodes) {
 function rm_some(nd,nodes,...whices) {
 function rm_all(nd,nodes) {
-function get_depth(nd,nodes) {
-function get_height(nd,nodes) {
-function get_fst_lyr_des_depth(nd,nodes) {
-function get_lst_lyr_des_depth(nd,nodes) {
-function get_which_lyr_des_depth(which,nd,nodes) {
-function get_lyr(nd,nodes) {
-function get_breadth(nd,nodes) {
-function get_count(nd,nodes) {
 
-function get_rsib_of_fst_ance_having_rsib(nd,nodes) {
-function get_sdfs_next(nd,nodes) {
-function get_drmost_des(nd,nodes){
-function get_sdfs_prev(nd,nodes) {
-function get_sdfs(nd,nodes) {
+
 
 function get_dlmost_des(nd,nodes) {
 function get_edfs_next(nd,nodes) {
 function get_lsib_of_fst_ance_having_lsib(nd,nodes) {
 function get_edfs_prev(nd,nodes) {
 function get_edfs(nd,nodes) {
+
+
+
 function clear_$visited(nodes) {
 function get_sedfs_next(nd,nodes) {
 function get_sedfs_prev(visited,nd,nodes) {

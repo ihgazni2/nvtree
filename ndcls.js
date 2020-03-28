@@ -269,7 +269,7 @@ function _root(nd) {
         old = ance
         ance = ance.$parent()
     }
-    return(ance)    
+    return(old)    
 }
 
 function _which_ance(index,nd) {
@@ -316,6 +316,116 @@ function _ances_count(nd,including_self=false) {
 
 
 /**/
+function _luncle(nd) {
+    let p = nd.$parent()
+    if(p === null) {
+        return(null)
+    } else {
+        return(p.$lsib())
+    } 
+}
+
+function _runcle(nd) {
+    let p = nd.$parent()
+    if(p === null) {
+        return(null)
+    } else {
+        return(p.$rsib())
+    } 
+}
+
+function _lcin(nd) {
+    let luncle = nd.$luncle()
+    if(!nd.$is_fstch()) {
+        return(null) 
+    } else if(luncle === null) {
+        return(null)
+    } else {
+        return(luncle.$lstch())
+    }
+}
+
+function _rcin(nd) {
+    let runcle = nd.$runcle()
+    if(!nd.$is_lstch()) {
+        return(null)
+    } else if(runcle === null) {
+        return(null)
+    } else {
+        return(runcle.$fstch())
+    }
+}
+
+/**/
+
+function _lyr(nd) {
+    let rt = nd.$root() 
+    let sdfs = rt.$sdfs() 
+    let depth = nd.$depth()
+    let lyr = sdfs.filter(nd=>(nd.$depth() === depth))
+    return(lyr)    
+}
+
+/**/
+
+
+function _breadth(nd) {
+    let lyr = nd.$lyr()
+    let breadth = lyr.indexOf(nd)
+    return(breadth)   
+}
+
+function _width(nd) {
+    //只计算叶子个数的宽度
+    let sdfs = nd.$sdfs()
+    sdfs = sdfs.filter(nd=>nd.$is_leaf())
+    return(sdfs.length)
+}
+
+function _offset(nd) {
+    //edfs filter-by-isleaf ,and then index 
+    //如果是非叶子,fstch的offset
+    
+}
+
+/**/
+
+
+function _deses(nd,including_self=false) {
+    let drmost = _drmost_des(nd) 
+    let sdfs = _sdfs(nd)
+    let index = sdfs.indexOf(drmost) 
+    if(including_self) {
+        return(sdfs.slice(0,index+1)) 
+    } else {
+        return(sdfs.slice(1,index+1)) 
+    } 
+}
+
+function _lst_lyr_deses(nd) {
+    let deses = nd.$deses(including_self=false)
+    let des_depths = deses.map(r=>r.$depth())
+    let max = Math.max(...des_depths)
+    deses = deses.filter(r=>(r.$depth()===max))
+    return(deses) 
+}
+
+function _which_lyr_deses(index,nd) {
+    let depth = nd.$depth()
+    let deses = nd.$deses(including_self=false)
+    let des_depths = deses.map(r=>r.$depth())
+    deses = deses.filter(r=>(r.$depth()===(depth+index)))
+    return(deses)
+}
+
+function _some_lyrs_deses(nd,...rel_depths) {
+    let depth = nd.$depth()
+    let abs_depths = rel_depths.map(r=>r+depth)
+    let deses = nd.$deses(including_self=false)
+    let des_depths = deses.map(r=>r.$depth())
+    deses = deses.filter(r=>(abs_depths.includes(r.$depth())))
+    return(deses)
+}
 
 
 /*add node */
@@ -339,6 +449,7 @@ function _prepend_child(nd,child) {
         //添加child 
     }   
     nd._fstch = child
+    return(child)
 }   
 
 
@@ -358,6 +469,7 @@ function _append_child(nd,child) {
         old_lstch._rsib = child
     }
     child._parent = nd
+    return(child)
 }
 
 
@@ -379,6 +491,7 @@ function _add_rsib(nd,rsib) {
         rsib._rsib = nd._rsib
     }
     nd._rsib = rsib
+    return(rsib)
 }
 
 
@@ -401,6 +514,7 @@ function _add_lsib(nd,lsib) {
         old_lsib._rsib = lsib
     }
     lsib._rsib = nd
+    return(lsib)
 }
 
 
@@ -408,26 +522,108 @@ function _insert_child(which,nd,child) {
     let children = nd.$children()
     let lngth = children.length
     if(lngth ===0) {
-        nd.$prepend_child(nd,child)
+        child = nd.$prepend_child(nd,child)
     } else {
         let cond = (which<=lngth) && (which >=0)
         if(!cond) {
             console.log("not in range!!")
-            return(nd)
         } else {
             if(which === 0) {
-                nd.$prepend_child(nd,child)
+                child = nd.$prepend_child(nd,child)
             } else if(which === lngth) {
-                nd.$append_child(nd,child)
+                child = nd.$append_child(nd,child)
             } else {
                 let lnd = children[which-1]
-                lnd.$add_rsib(child)
+                child = lnd.$add_rsib(child)
             }   
         }   
-    }   
+    }
+    return(child)   
 }   
 
 
+/*sdfs*/
+
+function _rsib_of_fst_ance_having_rsib(nd) {
+    let p = nd.$parent()
+    while(p!==null) {
+        let rsib = p.$rsib()
+        if(rsib !== null) {
+            return(rsib)
+        } else {
+            p = p.$parent()  
+        }
+    }
+    return(null)
+}
+
+function _sdfs_next(nd) {
+    let fstch = nd.$fstch()
+    if(fstch !== null) {
+        return(fstch)
+    } else {
+        let rsib = nd.$rsib()
+        if(rsib !== null) {
+            return(rsib)
+        } else {
+            return(nd.$rsib_of_fst_ance_having_rsib())
+        }
+    }    
+}
+
+function _drmost_des(nd) {
+    let old_lstch = nd
+    let lstch = nd.$lstch()
+    while(lstch !== null) {
+        old_lstch = lstch
+        lstch = lstch.$lstch()
+    }
+    return(old_lstch)
+}
+
+function _sdfs_prev(nd) {
+    if(nd.$is_root()) {
+        return(null)
+    }
+    let cond = nd.$is_leaf()
+    if(cond) {
+        let lsib = nd.$lsib()
+        if(lsib !== null) {
+            return(lsib)
+        } else {
+            let parent = nd.$parent()
+            return(parent)
+        }
+    } else {
+        let lsib = nd.$lsib()
+        if(lsib !== null) {
+            let cond = lsib.$is_leaf()
+            if(cond) {
+                return(lsib)
+            } else {
+                return(lsib.$drmost_des())
+            }
+        } else {
+            let parent = nd.$parent()
+            return(parent)
+        }
+    }
+}
+
+function _sdfs(nd) {
+    let depth = nd.$depth()
+    if(nd === null) {
+        return([])
+    } else {
+        let sdfs =[nd]
+        nd = nd.$sdfs_next()
+        while(nd!==null && (nd.$depth() >depth) ) {
+            sdfs.push(nd)
+            nd = nd.$sdfs_next()
+        }
+        return(sdfs)  
+    }  
+}
 
 
 /**/
@@ -542,25 +738,92 @@ class _Node {
     //
     $prepend_child(child) {
         child = (child===undefined)?(new _Node()):child
-        _prepend_child(this,child)       
+        return(_prepend_child(this,child))       
     }
     $insert_child(which,child) {
         child = (child===undefined)?(new _Node()):child
-        _insert_child(which,this,child)
+        return(_insert_child(which,this,child))
     }
     $append_child(child)  {
         child = (child===undefined)?(new _Node()):child
-        _append_child(this,child)
+        return(_append_child(this,child))
     }
     //
     $add_rsib(rsib) {
         rsib = (rsib===undefined)?(new _Node()):rsib
-        _add_rsib(this,rsib)
+        return(_add_rsib(this,rsib))
     }
     $add_lsib(lsib)  {
         lsib = (lsib===undefined)?(new _Node()):lsib
-        _add_lsib(this,lsib)
-    }    
+        return(_add_lsib(this,lsib))
+    }  
+    //
+    $rsib_of_fst_ance_having_rsib() {
+        return(_rsib_of_fst_ance_having_rsib(this))
+    } 
+    $sdfs_next() {
+        return(_sdfs_next(this)) 
+    }
+    $drmost_des() {
+        return(_drmost_des(this))
+    }
+    $sdfs_prev() {
+        return(_sdfs_prev(this))
+    }
+    $sdfs() {
+        return(_sdfs(this))
+    }
+    //
+    $deses() {
+        return(_deses(this))
+    }
+    $lst_lyr_deses() {
+        return(_lst_lyr_deses(this))
+    }
+    $which_lyr_deses(index) {
+        return(_which_lyr_deses(index,this))
+    }
+    $some_lyrs_deses(...rel_depths) {
+        return(_some_lyrs_deses(this,...rel_depths))
+    }
+    //
+    $count(including_self=true) {
+        return(_deses(this,including_self).length)
+    }
+    $depth(including_self=false) {
+        return(_ances(this,including_self).length)
+    }
+    $height() {
+        let depth = this.$depth()
+        let sdfs = this.$sdfs()
+        let des_depths = sdfs.map(nd=>nd.$depth())
+        let max = Math.max(...des_depths)
+        return(max-depth+1)        
+    }
+    $breadth() {
+        return(_breadth(this))
+    }
+    $width() {
+        return(_width(this))
+    }
+    //
+    $lyr() {
+        return(_lyr(this))
+    }
+    //
+    $lcin() {
+        return(_lcin(this))
+    }
+    $rcin() {
+        return(_rcin(this))
+    }
+    $luncle() {
+        return(_luncle(this))
+    }
+    $runcle() {
+        return(_runcle(this))
+    }
+    //          
 }
 
 
@@ -584,66 +847,24 @@ module.exports = {
 /*
 var ndcls = require('./ndcls')
 var rt = new ndcls.Node()
-rt.$append_child()
-rt.$append_child()
-rt.$append_child()
-rt.$prepend_child()
-rt.$prepend_child()
-rt.$prepend_child()
 
-
-
-assert.strictEqual(rt.$children_count(),6)
-rt.$fstch().$guid
-rt.$lstch().$guid
-assert.strictEqual(rt.$which_child(2).$guid,rt.$fstch()._rsib._rsib.$guid)
-rt.$children().map(nd=>nd.$guid)
-rt.$some_children(0,2,4).map(nd=>nd.$guid)
-
-
-assert.strictEqual(rt.$rsib(),null);
-assert.strictEqual(rt.$lsib(),null);
-rt.$fstsib()
-rt.$lstsib()
-rt.$psibs()
-rt.$fsibs()
-rt.$sibs()
-rt.$which_sib(0).$guid === rt.$guid
-
-var nd = rt.$which_child(2)
-assert.strictEqual(nd.$fstsib(),rt.$fstch());
-nd.$lstsib().$guid
-nd.$which_sib(0).$guid
-nd.$psibs().map(nd=>nd.$guid)
-nd.$fsibs().map(nd=>nd.$guid)
-nd.$sibs(including_self=true).map(nd=>nd.$guid)
-nd.$which_sib(3).$guid
-nd.$sibseq()
-nd.$some_sibs(1,3).map(nd=>nd.$guid)
-nd.$guid
-nd.$add_lsib()
-nd.$sibs(including_self=true).map(nd=>nd.$guid)
-nd.$add_rsib()
-nd.$sibs(including_self=true).map(nd=>nd.$guid)
-
-
-rt.$insert_child(3)
-nd.$sibs(including_self=true).map(nd=>nd.$guid);
-
-
-assert.strictEqual(rt,nd.$parent());
-
-
-nd.$append_child()
-nd.$append_child()
-
-
-nd = rt.$which_child(3)
-nd.$append_child()
-nd.$append_child()
-
-
-nd = nd.$fstch()
+function fill_rt(rt) {
+    var nd1 = rt.$append_child()
+        var nd2 = nd1.$append_child()
+        var nd3 = nd1.$append_child()
+            var nd4 = nd3.$append_child()
+            var nd5 = nd3.$append_child()
+    var nd6 = rt.$append_child()
+        var nd7 = nd6.$append_child()
+        var nd8 = nd6.$append_child()
+        var nd9 = nd6.$append_child()
+            var nd10 = nd9.$append_child()
+            var nd11 = nd9.$append_child()  
+            var nd12 = nd9.$append_child()  
+            var nd13 = nd9.$append_child()  
+            var nd14 = nd9.$append_child() 
+            var nd15 = nd9.$append_child() 
+   return([rt,nd1,nd2,nd3,nd4,nd5,nd6,nd7,nd8,nd9,nd10,nd11,nd12,nd13,nd14,nd15])    
+}
 
 */
-
