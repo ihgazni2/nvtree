@@ -14,16 +14,6 @@ function rm_which(index,nd,nodes) {
 function rm_some(nd,nodes,...whices) {
 function rm_all(nd,nodes) {
 
-
-
-function get_dlmost_des(nd,nodes) {
-function get_edfs_next(nd,nodes) {
-function get_lsib_of_fst_ance_having_lsib(nd,nodes) {
-function get_edfs_prev(nd,nodes) {
-function get_edfs(nd,nodes) {
-
-
-
 function clear_$visited(nodes) {
 function get_sedfs_next(nd,nodes) {
 function get_sedfs_prev(visited,nd,nodes) {
@@ -39,9 +29,3 @@ function edfs2sdfs(edfs,nodes) {
 function edfs2sedfs(edfs,nodes,deepcopy=false,clear=true) {
 function sedfs2mat(sedfs,nodes) {
 function sedfs2sdfs(sedfs,nodes) {
-function sedfs2edfs(sedfs,nodes) {
-function get_deses(nd,nodes,including_self=false) {
-function get_fst_lyr_deses(nd,nodes) {
-function get_lst_lyr_deses(nd,nodes) {
-function get_which_lyr_deses(which,nd,nodes) {
-function get_some_deses(nd,nodes,...whiches) {

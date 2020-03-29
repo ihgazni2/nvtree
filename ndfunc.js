@@ -975,7 +975,11 @@ function get_edfs(nd,nodes) {
     let nxt = get_dlmost_des(nd,nodes)
     while(nxt !== null ) {
         edfs.push(nxt)
-        nxt = get_edfs_next(nxt,nodes)
+        if(nxt._id === nd._id) {
+            break;
+        } else {
+            nxt = get_edfs_next(nxt,nodes)
+        }
     }
     return(edfs)
 }

@@ -384,8 +384,19 @@ function _width(nd) {
 
 function _offset(nd) {
     //edfs filter-by-isleaf ,and then index 
-    //如果是非叶子,fstch的offset
-    
+    //如果是非叶子,dlmost的offset
+    let rt = nd.$root()
+    let edfs = rt.$edfs()
+    let index;
+    if(nd.$is_leaf()) {
+        index = edfs.indexOf(nd) 
+    } else {
+        let dlmost = nd.$dlmost_des()
+        index = edfs.indexOf(dlmost)
+    }
+    edfs = edfs.slice(0,index+1)
+    offset = edfs.filter(nd=>nd.$is_leaf()).length - 1
+    return(offset) 
 }
 
 /**/
@@ -625,6 +636,87 @@ function _sdfs(nd) {
     }  
 }
 
+/**/
+
+function _dlmost_des(nd) {
+    let old_fstch = nd
+    let fstch = nd.$fstch()
+    while(fstch !== null) {
+        old_fstch = fstch
+        fstch = fstch.$fstch()
+    }
+    return(old_fstch)
+}
+
+function _edfs_next(nd) {
+    let rsib = nd.$rsib()
+    if(rsib === null) {
+        //如果没有右兄弟，说明节点是lstch,此时应该返回父节点
+        let p = nd.$parent()
+        return(p)
+    } else {
+       //如果有右兄弟，返回down-left-most-of-rsib
+       return(rsib.$dlmost_des())
+    }
+}
+
+function _lsib_of_fst_ance_having_lsib(nd) {
+    /*
+        along the parent chain until root,not_including_self
+        if the parent have lsib,return the lsib-of-parent
+        ---------
+    */
+    let parent = nd.$parent() 
+    while(parent!==null) {
+        let lsib = parent.$lsib()
+        if(lsib!==null) {
+            return(lsib)
+        } else {
+            parent = parent.$parent()
+        }
+    }
+    return(null)
+}
+
+function _edfs_prev(nd) {
+    let cond = nd.$is_leaf() 
+    if(!cond) {
+        return(nd.$lstch())
+    } else {
+       let lsib = nd.$lsib()
+       if(lsib === null) {
+           return(nd.$lsib_of_fst_ance_having_lsib())
+       } else {
+           return(lsib)
+       }
+    }   
+}
+
+
+
+function _edfs(nd) {
+    let edfs = []
+    let nxt = nd.$dlmost_des()
+    while(nxt !== null ) {
+        edfs.push(nxt)
+        if(nxt === nd) {
+            break;
+        } else {
+            nxt = nxt.$edfs_next()
+        }
+    }
+    return(edfs)
+
+}
+
+
+
+
+
+
+/**/
+
+
 
 /**/
 function _add_extra(d,nd) {
@@ -774,6 +866,25 @@ class _Node {
         return(_sdfs(this))
     }
     //
+    $dlmost_des() {
+        return(_dlmost_des(this))
+    }
+    $edfs_next() {
+        return(_edfs_next(this))
+    }
+    $lsib_of_fst_ance_having_lsib() {
+        return(_lsib_of_fst_ance_having_lsib(this))
+    }
+    $edfs_prev() {
+        return(_edfs_prev(this))
+    }
+    $edfs() {
+        return(_edfs(this))
+    }
+    $offset() {
+        return(_offset(this))
+    }
+    //
     $deses() {
         return(_deses(this))
     }
@@ -865,6 +976,38 @@ function fill_rt(rt) {
             var nd14 = nd9.$append_child() 
             var nd15 = nd9.$append_child() 
    return([rt,nd1,nd2,nd3,nd4,nd5,nd6,nd7,nd8,nd9,nd10,nd11,nd12,nd13,nd14,nd15])    
+}
+
+function tst_edfs() {
+    var rt = new ndcls.Node()
+    var nodes = fill_rt(rt)
+    var arr = rt.$edfs().map(nd=>nd.$guid)
+    arr[0] === nodes[2].$guid
+    arr[1] === nodes[4].$guid
+    arr[2] === nodes[5].$guid
+    arr[3] === nodes[3].$guid
+    arr[4] === nodes[1].$guid
+    arr[5] === nodes[7].$guid
+    arr[6] === nodes[8].$guid
+    arr[7] === nodes[10].$guid
+    arr[12] === nodes[15].$guid
+    arr[13] === nodes[9].$guid
+    arr[14] === nodes[6].$guid
+    arr[15] === nodes[0].$guid
+    
+    var arr = nodes[1].$edfs().map(nd=>nd.$guid)
+    arr[0] === nodes[2].$guid
+    arr[1] === nodes[4].$guid
+    arr[2] === nodes[5].$guid
+    arr[3] === nodes[3].$guid
+    arr[4] === nodes[1].$guid
+
+    nodes[15].$edfs_prev().$guid === nodes[14].$guid
+    nodes[14].$edfs_prev().$guid === nodes[13].$guid
+    nodes[11].$edfs_prev().$guid === nodes[10].$guid
+    nodes[10].$edfs_prev().$guid === nodes[8].$guid
+    nodes[7].$edfs_prev().$guid === nodes[1].$guid
+    nodes[1].$edfs_prev().$guid === nodes[3].$guid 
 }
 
 */
