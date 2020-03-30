@@ -1,5 +1,6 @@
+const ndutil = require('./util.js')
 const cmmn = require('./cmmn.js')
-
+const ndfunc = require('./ndfunc.js')
 
 function _is_inited(nd) {
     //被添加到了树上
@@ -724,6 +725,8 @@ function _add_extra(d,nd) {
         nd[k] = d[k]
     }
 }
+/**/
+
 
 
 /**/
@@ -735,7 +738,7 @@ class _Node {
         this._rsib = undefined
         this._parent = undefined
         this._tree = undefined
-        this.$guid = cmmn.gen_guid()
+        //this.$guid = cmmn.gen_guid()
     }
     $is_inited() {
         return(_is_inited(this))
@@ -934,80 +937,156 @@ class _Node {
     $runcle() {
         return(_runcle(this))
     }
-    //          
+    //
+    $sdfs_repr() {
+        let rt = this.$root()
+        let tree = _sdfs(rt)
+        let sdfs = _sdfs(this)
+        let depths = sdfs.map(nd=>nd.$depth()) 
+        let indents = depths.map(depth=>'    '.repeat(depth))
+        indents.forEach((indent,i)=>{console.log(indent+'['+tree.indexOf(sdfs[i])+']')})    
+    }          
+}
+
+
+/**/
+
+function _set_id(nd) {
+    //root代表一棵树, 给每个节点加sdfs_seq
+    let tree = _sdfs(nd)
+    tree.forEach(
+        (nd,i) => {nd._id = i}
+    )
+}
+
+
+function _rtjson2rt(root) {
+    let rt = new Node()
+    rt._id = root._id
+    return(rt)       
+}
+
+function _get_ancend_via_id(id,nd) {
+    while(nd._id !== id) {
+        nd=nd._parent
+    }
+    return(nd)
+}
+
+
+function _load(ndict) {
+    //从一个json结构变成tree,返回root
+    let k = cmmn.dict_keys(ndict)[0]
+    let root = ndfunc.get_root(ndict[k],ndict)
+    let rt = _rtjson2rt(root)
+    let prnd = rt
+    let prnj = root
+    let nj = ndfunc.get_sdfs_next(prnj,ndict)
+    let nd;
+    while(nj!==null) {
+        if(prnj._fstch ===nj._id) {
+            nd = prnd.$prepend_child()
+            nd._id = nj._id
+            prnd = nd
+            prnj = nj
+            nj = ndfunc.get_sdfs_next(prnj,ndict)
+        } else if(prnj._rsib ===nj._id) {
+            nd = prnd.$add_rsib()
+            nd._id = nj._id
+            prnd = nd
+            prnj = nj
+            nj = ndfunc.get_sdfs_next(prnj,ndict)
+        } else if(nj._parent!==null && nj._parent!==undefined) {
+            let pid = nj._parent
+            prnd = _get_ancend_via_id(pid,prnd)
+            nd = prnd.$append_child()
+            nd._id = nj._id
+            prnd = nd
+            prnj = nj
+            nj = ndfunc.get_sdfs_next(prnj,ndict)
+        } else {
+            console.log('Impossible',prnd,prnj,nj)
+        } 
+    }
+    return(rt)
+}
+
+function _dictize_nd_property(nd,k) {
+    if(nd[k] === null) {
+        return(null)
+    } else if(nd[k] === undefined) {
+        return(undefined) 
+    } else {
+        return(nd[k]._id)
+    }
+}
+
+function _dump(rt) {
+    //把一个nd结构变成json结构, 这个nd 相当于脱离了tree的一个deepcopy
+    _set_id(rt)
+    let sdfs = rt.$sdfs()
+    let treeid = rt._id
+    let nodes_dict = {}
+    sdfs.forEach(
+        (nd,i) => {
+            let d = {}
+            d._tree = treeid
+            d._fstch = _dictize_nd_property(nd,'_fstch') 
+            d._lsib = _dictize_nd_property(nd,'_lsib')
+            d._rsib = _dictize_nd_property(nd,'_rsib') 
+            d._parent = _dictize_nd_property(nd,'_parent') 
+            d._id = nd._id
+            nodes_dict[nd._id] = d
+        }
+    )
+    return(nodes_dict)
 }
 
 
 class Node extends _Node {
     constructor() {
-        //初始化为根节点,根节点代表一棵树
         super();
+        //初始化为根节点,根节点代表一棵树
         this._fstch = null
         this._lsib = null
         this._rsib = null
         this._parent = null
         this._tree = this
     }
+    $dump() {
+        return(_dump(this))
+    }
+    $dump2file(fn) {
+        let ndict = _dump(this)
+        ndutil.wjson(fn,ndict)
+    }
+}
+
+function load(from) {
+    if(typeof(from) === 'string') {
+        let ndict = ndutil.rjson(from)
+        return(_load(ndict))
+    } else if(typeof(from) === 'object') {
+        let ndict = from
+        return(_load(ndict))
+    } else {
+        return(new Node())
+    }
 }
 
 module.exports = {
     Node,
+    load,
 }
 
 
 /*
 var ndcls = require('./ndcls')
-var rt = new ndcls.Node()
+var sh=require('./ndfuncterm.js').sdfs_show_root_tree
 
-function fill_rt(rt) {
-    var nd1 = rt.$append_child()
-        var nd2 = nd1.$append_child()
-        var nd3 = nd1.$append_child()
-            var nd4 = nd3.$append_child()
-            var nd5 = nd3.$append_child()
-    var nd6 = rt.$append_child()
-        var nd7 = nd6.$append_child()
-        var nd8 = nd6.$append_child()
-        var nd9 = nd6.$append_child()
-            var nd10 = nd9.$append_child()
-            var nd11 = nd9.$append_child()  
-            var nd12 = nd9.$append_child()  
-            var nd13 = nd9.$append_child()  
-            var nd14 = nd9.$append_child() 
-            var nd15 = nd9.$append_child() 
-   return([rt,nd1,nd2,nd3,nd4,nd5,nd6,nd7,nd8,nd9,nd10,nd11,nd12,nd13,nd14,nd15])    
-}
-
-function tst_edfs() {
-    var rt = new ndcls.Node()
-    var nodes = fill_rt(rt)
-    var arr = rt.$edfs().map(nd=>nd.$guid)
-    arr[0] === nodes[2].$guid
-    arr[1] === nodes[4].$guid
-    arr[2] === nodes[5].$guid
-    arr[3] === nodes[3].$guid
-    arr[4] === nodes[1].$guid
-    arr[5] === nodes[7].$guid
-    arr[6] === nodes[8].$guid
-    arr[7] === nodes[10].$guid
-    arr[12] === nodes[15].$guid
-    arr[13] === nodes[9].$guid
-    arr[14] === nodes[6].$guid
-    arr[15] === nodes[0].$guid
-    
-    var arr = nodes[1].$edfs().map(nd=>nd.$guid)
-    arr[0] === nodes[2].$guid
-    arr[1] === nodes[4].$guid
-    arr[2] === nodes[5].$guid
-    arr[3] === nodes[3].$guid
-    arr[4] === nodes[1].$guid
-
-    nodes[15].$edfs_prev().$guid === nodes[14].$guid
-    nodes[14].$edfs_prev().$guid === nodes[13].$guid
-    nodes[11].$edfs_prev().$guid === nodes[10].$guid
-    nodes[10].$edfs_prev().$guid === nodes[8].$guid
-    nodes[7].$edfs_prev().$guid === nodes[1].$guid
-    nodes[1].$edfs_prev().$guid === nodes[3].$guid 
+function tst_sedfs() {
+    var rt = ndcls.load('./TEST/ndict.json')
+    sh(rt.$dump())
 }
 
 */
