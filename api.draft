@@ -16,12 +16,6 @@ function rm_which(index,nd,nodes) {
 function rm_some(nd,nodes,...whices) {
 function rm_all(nd,nodes) {
 
-function clear_$visited(nodes) {
-function get_sedfs_next(nd,nodes) {
-function get_sedfs_prev(visited,nd,nodes) {
-function is_sedfs_traverse_finished(start_id,nd) {
-function get_sedfs(nd,nodes,deepcopy=false,clear=true) {
-
 
 function nd2ele(nd,nodes) {
 function _nd2unhandled_ele(nd) {

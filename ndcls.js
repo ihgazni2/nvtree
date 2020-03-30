@@ -711,8 +711,97 @@ function _edfs(nd) {
 }
 
 
+/**/
 
+function _sedfs_next(nd) {
+    let visited = nd.$visited
+    let cond = nd.$is_leaf() 
+    if(cond) {
+        if(visited) {
+            let rsib = nd.$rsib()
+            if(rsib === null) {
+                return(nd.$parent())
+            } else {
+                return(rsib)
+            }
+        } else {
+            nd.$visited = true
+            return(nd)
+        }
+    } else {
+        if(visited) {
+            let rsib = nd.$rsib()
+            if(rsib === null) {
+                return(nd.$parent())
+            } else {
+                return(rsib)
+            }
+        } else {
+            nd.$visited = true
+            return(nd.$fstch())
+        }
+    }   
+}
 
+function _sedfs_prev(visited,nd) {
+    let cond = nd.$is_leaf() 
+    if(cond) {
+        if(visited) {
+            return(nd)
+        } else {
+            let lsib = nd.$lsib()
+            if(lsib === null) {
+                return(nd.$parent())
+            } else {
+                return(lsib)
+            }
+        }
+    } else {
+        if(visited) {
+            return(nd.$lstch())
+        } else {
+            let lsib = nd.$lsib()
+            if(lsib === null) {
+                return(nd.$parent())
+            } else {
+                return(lsib)
+            }
+        }
+    }
+}
+
+function _clear_visited(nd) {
+    let sdfs = nd.$sdfs()
+    sdfs.forEach(
+        nd=>{delete nd.$visited}
+    )
+}
+
+function _is_sedfs_traverse_finished(startnd,nd) {
+    let cond = (nd.$visited) && (startnd === nd)
+    return(cond)
+}
+
+function _sedfs(nd) {
+    _clear_visited(nd);
+    let sedfs = []
+    let st = new Set()
+    let startnd = nd
+    while(!_is_sedfs_traverse_finished(startnd,nd)) {
+        if(st.has(nd)) {
+            nd.$close_at = sedfs.length
+        } else {
+            nd.$open_at = sedfs.length
+            st.add(nd) 
+        }
+        sedfs.push(nd)
+        nd = _sedfs_next(nd)
+    }
+    startnd.$close_at = sedfs.length
+    sedfs.push(startnd)
+    sedfs.forEach(nd=>{delete nd.$visited})     
+    return(sedfs)    
+}
 
 
 /**/
@@ -888,6 +977,16 @@ class _Node {
         return(_offset(this))
     }
     //
+    $sedfs_next() {
+        return(_sedfs_next(this))
+    }
+    $sedfs_prev(visited) {
+        return(_sedfs_prev(this))
+    }
+    $sedfs(){
+        return(_sedfs(this))
+    }
+    //
     $deses() {
         return(_deses(this))
     }
@@ -945,6 +1044,23 @@ class _Node {
         let depths = sdfs.map(nd=>nd.$depth()) 
         let indents = depths.map(depth=>'    '.repeat(depth))
         indents.forEach((indent,i)=>{console.log(indent+'['+tree.indexOf(sdfs[i])+']')})    
+    }
+    $sedfs_repr() {
+        let rt = this.$root()
+        _set_id(rt)       
+        let sedfs = _sedfs(this)
+        sedfs.forEach(
+            (nd,i)=> {
+                let depth = nd.$depth()
+                let indent = '    '.repeat(depth)
+                if(i === nd.$open_at)  {
+                    console.log(indent+'<'+nd._id+'>')
+                }
+                if(i === nd.$close_at)  {
+                    console.log(indent+'</'+nd._id+'>')
+                }                               
+            }
+        )
     }          
 }
 
@@ -1087,6 +1203,9 @@ var sh=require('./ndfuncterm.js').sdfs_show_root_tree
 function tst_sedfs() {
     var rt = ndcls.load('./TEST/ndict.json')
     sh(rt.$dump())
+    var sedfs = rt.$sedfs()
+    rt.$sedfs_repr()
 }
+
 
 */
