@@ -335,8 +335,8 @@ function update_orig_nodes(nsdfs,nodes) {
 
 function leafize(nd) {
     nd._fstch = null
-    nd._lsib = null
-    nd._rsib = null
+    //nd._lsib = null
+    //nd._rsib = null
     return(nd)
 }
 
@@ -369,7 +369,7 @@ function disconnect(nd,nodes) {
             //右兄弟变成了fstch, lsib 指向null
             rsib._lsib = null
             //右兄弟变成了fstch,parent要指向rsib
-            rsib._parent = nd._parent
+            //rsib._parent = nd._parent fstch的parent不需要改变
             // parent 的fstch 要指向rsib
             let parent = get_parent(nd,nodes) 
             parent._fstch = nd._rsib  

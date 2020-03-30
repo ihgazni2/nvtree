@@ -805,6 +805,80 @@ function _sedfs(nd) {
 
 
 /**/
+function _leafize(nd) {
+    nd._fstch = null
+    return(nd)
+}
+
+function _rootize(nd) {
+    nd._lsib = null
+    nd._rsib = null
+    nd._parent = null
+    return(nd)
+}
+
+function _update_disconnected_nodes(nd) {
+    let nsdfs = nd.$sdfs() 
+    nsdfs.forEach(
+       nd=> {
+           nd._tree = nsdfs[0]
+       }
+    )
+    return(nsdfs)
+}
+
+
+
+function _disconn(nd) {
+    let cond = nd.$is_root() 
+    if(cond) {
+        //do nothing
+        return(nd)
+    } else if(nd.$is_lonely()) {
+        //
+        let parent = nd.$parent() 
+        _leafize(parent); 
+        let nsdfs = _update_disconnected_nodes(nd);
+        _rootize(nd);
+        return(nd)
+    } else {
+        if(nd.$is_fstch()) {
+            //节点变味新树的根节点
+            let rsib = nd.$rsib()
+            //右兄弟变成了fstch, lsib 指向null
+            rsib._lsib = null
+            //右兄弟变成了fstch,parent要指向rsib
+            // parent 的fstch 要指向rsib
+            let parent = nd.$parent() 
+            parent._fstch = nd._rsib
+            //后代节点关系不变，但是tree变为当前节点._id
+            let nsdfs = _update_disconnected_nodes(nd)
+            //nd 变为分离出去的tree的root
+            _rootize(nd);
+            return(nd)
+        } else if(nd.$is_lstch()) {    
+            //节点变味新树的根节点
+            let lsib = nd.$lsib() 
+            lsib._rsib = nd._rsib
+            //左兄弟变成了lstch,左邻居要指向parent
+            lsib._parent = nd._parent
+            //后代节点关系不变，但是tree变为当前节点._id
+            let nsdfs = _update_disconnected_nodes(nd)
+            //nd 变为分离出去的tree的root
+            _rootize(nd);
+            return(nd)
+        } else {
+            //节点变味新树的根节点
+            let lsib = nd.$lsib() 
+            lsib._rsib = nd._rsib
+            //后代节点关系不变，但是tree变为当前节点._id
+            let nsdfs = _update_disconnected_nodes(nd)
+            //nd 变为分离出去的tree的root
+            _rootize(nd);
+            return(nd)
+        }
+    }  
+}
 
 
 
@@ -827,7 +901,7 @@ class _Node {
         this._rsib = undefined
         this._parent = undefined
         this._tree = undefined
-        //this.$guid = cmmn.gen_guid()
+        this.$guid = cmmn.gen_guid()
     }
     $is_inited() {
         return(_is_inited(this))
@@ -844,7 +918,7 @@ class _Node {
     $is_leaf() {
         return(_is_leaf(this))
     }
-    $is_lonly() {
+    $is_lonely() {
         return(_is_lonely(this))
     }
     //child
@@ -1043,7 +1117,7 @@ class _Node {
         let sdfs = _sdfs(this)
         let depths = sdfs.map(nd=>nd.$depth()) 
         let indents = depths.map(depth=>'    '.repeat(depth))
-        indents.forEach((indent,i)=>{console.log(indent+'['+tree.indexOf(sdfs[i])+']')})    
+        indents.forEach((indent,i)=>{console.log(indent+'['+tree.indexOf(sdfs[i])+']'+' : '+sdfs[i].$guid)})    
     }
     $sedfs_repr() {
         let rt = this.$root()
@@ -1054,14 +1128,35 @@ class _Node {
                 let depth = nd.$depth()
                 let indent = '    '.repeat(depth)
                 if(i === nd.$open_at)  {
-                    console.log(indent+'<'+nd._id+'>')
+                    console.log(indent+'<'+nd._id+' : ' + nd.$guid +'>')
                 }
                 if(i === nd.$close_at)  {
-                    console.log(indent+'</'+nd._id+'>')
+                    console.log(indent+'</'+nd._id+' : ' +nd.$guid +'>')
                 }                               
             }
         )
-    }          
+    }
+    //
+    $disconn() {
+        return(_disconn(this))
+    }
+    //
+    $dump() {
+        if(this.$is_root()) {
+            return(_dump(this))
+        } else {
+            console.log('only root !!!')
+        }
+    }
+    $dump2file(fn) {
+        if(this.$is_root()) {
+            let ndict = _dump(this)
+            ndutil.wjson(fn,ndict)
+        } else {
+            console.log('only root !!!')
+        }
+    }
+    //          
 }
 
 
@@ -1103,12 +1198,14 @@ function _load(ndict) {
         if(prnj._fstch ===nj._id) {
             nd = prnd.$prepend_child()
             nd._id = nj._id
+            nd.$guid = nj._guid
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
         } else if(prnj._rsib ===nj._id) {
             nd = prnd.$add_rsib()
             nd._id = nj._id
+            nd.$guid = nj._guid
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1117,6 +1214,7 @@ function _load(ndict) {
             prnd = _get_ancend_via_id(pid,prnd)
             nd = prnd.$append_child()
             nd._id = nj._id
+            nd.$guid = nj._guid
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1152,6 +1250,7 @@ function _dump(rt) {
             d._rsib = _dictize_nd_property(nd,'_rsib') 
             d._parent = _dictize_nd_property(nd,'_parent') 
             d._id = nd._id
+            d._guid = nd.$guid
             nodes_dict[nd._id] = d
         }
     )
@@ -1168,13 +1267,6 @@ class Node extends _Node {
         this._rsib = null
         this._parent = null
         this._tree = this
-    }
-    $dump() {
-        return(_dump(this))
-    }
-    $dump2file(fn) {
-        let ndict = _dump(this)
-        ndutil.wjson(fn,ndict)
     }
 }
 
@@ -1206,6 +1298,5 @@ function tst_sedfs() {
     var sedfs = rt.$sedfs()
     rt.$sedfs_repr()
 }
-
 
 */

@@ -5,11 +5,8 @@ function update_nodes_ids(nodes0,nodes1) {
 function update_treeid(nd,cnodes) {
 function update_disconnected_nodes(nd,nodes) {
 function update_orig_nodes(nsdfs,nodes) {
-function leafize(nd) {
-function rootize(nd) {
 
 
-function disconnect(nd,nodes) {
 function rm_fstch(nd,nodes) {
 function rm_lstch(nd,nodes) {
 function rm_which(index,nd,nodes) {

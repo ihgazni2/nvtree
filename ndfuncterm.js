@@ -77,7 +77,7 @@ function get_sdfs_repr_arr(nd,nodes,f){
     let conns_array = sdfs.map(nd=>nd._ui.conns)
     conns_array = conns_array.map(conns=>conns.slice(depth))
     conns_array = conns_array.map(conns=>conns2repr(conns,dflt_sdfs_show_connd))
-    let arr = conns_array.map((conns,i)=>(conns+sdfs[i]._id))
+    let arr = conns_array.map((conns,i)=>(conns+'['+sdfs[i]._id+']'+' : '+sdfs[i]._guid))
     arr = arr.filter((r,i)=>(sdfs[i]._ui.display === true))
     return(arr)
 }
