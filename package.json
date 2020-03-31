@@ -1,0 +1,19 @@
+{
+  "name": "ndtreejs",
+  "version": "1.0.0",
+  "description": "node tree",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/navegador5/nvnode.git"
+  },
+  "author": "dli",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/navegador5/nvnode/issues"
+  },
+  "homepage": "https://github.com/navegador5/nvnode#readme"
+}

@@ -1,6 +1,7 @@
 const ndutil = require('./util.js')
 const cmmn = require('./cmmn.js')
 const ndfunc = require('./ndfunc.js')
+const EventTarget = require('./event-target.js').EventTarget
 
 function _is_inited(nd) {
     //被添加到了树上
@@ -531,22 +532,22 @@ function _add_lsib(nd,lsib) {
 
 
 function _insert_child(which,nd,child) {
-    let children = nd.$children()
+    let children = _children(nd)
     let lngth = children.length
     if(lngth ===0) {
-        child = nd.$prepend_child(nd,child)
+        child = _prepend_child(nd,child)
     } else {
         let cond = (which<=lngth) && (which >=0)
         if(!cond) {
             console.log("not in range!!")
         } else {
             if(which === 0) {
-                child = nd.$prepend_child(nd,child)
+                child = _prepend_child(nd,child)
             } else if(which === lngth) {
-                child = nd.$append_child(nd,child)
+                child = _append_child(nd,child)
             } else {
                 let lnd = children[which-1]
-                child = lnd.$add_rsib(child)
+                child = _add_rsib(lnd,child)
             }   
         }   
     }
@@ -890,12 +891,47 @@ function _add_extra(d,nd) {
 }
 /**/
 
+function _nd2unhandled_ele(nd) {
+    let ele = {}
+    ele._nd = nd
+    ele._children = []
+    return(ele)
+}
+
+
+function _sdfs2mat(sdfs) {
+    let m = []
+    let nd = sdfs[0]
+    let unhandled = [_nd2unhandled_ele(nd)]
+    unhandled[0]._pbreadth = null
+    while(unhandled.length>0){
+        let next_unhandled = []
+        for(let i=0;i<unhandled.length;i++) {
+            unhandled[i]._breadth = i
+            unhandled[i]._depth = m.length
+            let children = unhandled[i]._nd.$children() 
+            children = children.map(nd=>_nd2unhandled_ele(nd))
+            children.forEach(
+                (r,index)=>{
+                    r._pbreadth = unhandled[i]._breadth
+                    unhandled[i]._children.push([(m.length+1),next_unhandled.length+index])
+                }
+            )
+            next_unhandled = next_unhandled.concat(children)
+        }
+        let lyr = unhandled
+        m.push(lyr)
+        unhandled = next_unhandled
+    }  
+    return(m)
+}
 
 
 /**/
 
-class _Node {
+class _Node extends EventTarget {
     constructor() {
+        super();
         this._fstch = null
         this._lsib = undefined
         this._rsib = undefined
@@ -1005,6 +1041,29 @@ class _Node {
     $append_child(child)  {
         child = (child===undefined)?(new _Node()):child
         return(_append_child(this,child))
+    }
+    $clone() {
+        if(_is_root(this)) {
+            let ndict = _dump(this)
+            return(_load(ndict))
+        } else {
+            let index = _sibseq(this)
+            let parent = _parent(this)
+            _disconn(this)
+            let ndict = _dump(this)
+            let dup = _load(ndict)
+            _insert_child(index,parent,this)
+            return(dup)   
+        } 
+    }
+    $append_children(n,child) {
+        let children = []
+        for(let i=0;i<n;i++) {
+            let ch = (child===undefined)?(new _Node()):child.$clone()
+            ch = _append_child(this,ch)
+            children.push(ch)
+        }
+        return(children)
     }
     //
     $add_rsib(rsib) {
@@ -1140,6 +1199,26 @@ class _Node {
     $disconn() {
         return(_disconn(this))
     }
+    $rm_fstch() {
+        let fstch = this._fstch
+        return(_disconn(fstch))
+    }
+    $rm_lstch() {
+        let lstch = _lstch(this)
+        return(_disconn(lstch))
+    }
+    $rm_which(index) {
+        let child = _which_child(index,this) 
+        return(_disconn(child))
+    }
+    $rm_some_children(...indexes) {
+        let children = _some_children(this,...indexes)
+        return(children.map(child=>_disconn(child)))
+    }
+    $rm_all_children() {
+        let children = _children(this)
+        return(children.map(child=>_disconn(child)))
+    }
     //
     $dump() {
         if(this.$is_root()) {
@@ -1156,7 +1235,10 @@ class _Node {
             console.log('only root !!!')
         }
     }
-    //          
+    //
+    $sdfs2mat() {
+        return(_sdfs2mat(_sdfs(this)))
+    }          
 }
 
 
@@ -1172,8 +1254,9 @@ function _set_id(nd) {
 
 
 function _rtjson2rt(root) {
-    let rt = new Node()
+    let rt = new Tree()
     rt._id = root._id
+    rt.$guid = root._guid
     return(rt)       
 }
 
@@ -1258,7 +1341,7 @@ function _dump(rt) {
 }
 
 
-class Node extends _Node {
+class Tree extends _Node {
     constructor() {
         super();
         //初始化为根节点,根节点代表一棵树
@@ -1278,13 +1361,22 @@ function load(from) {
         let ndict = from
         return(_load(ndict))
     } else {
-        return(new Node())
+        return(new Tree())
     }
 }
 
+function clone(nd) {
+    let ndcit = nd.$dump()
+    return(load(ndict))
+}
+
+
 module.exports = {
-    Node,
-    load,
+    Node:_Node,
+    Tree:Tree,
+    Root:Tree,
+    load:load,
+    clone:clone,
 }
 
 
@@ -1292,11 +1384,32 @@ module.exports = {
 var ndcls = require('./ndcls')
 var sh=require('./ndfuncterm.js').sdfs_show_root_tree
 
-function tst_sedfs() {
-    var rt = ndcls.load('./TEST/ndict.json')
-    sh(rt.$dump())
-    var sedfs = rt.$sedfs()
-    rt.$sedfs_repr()
+var rt = ndcls.load('./TEST/ndict.json')
+sh(rt.$dump())
+var sedfs = rt.$sedfs()
+rt.$sedfs_repr()
+
+var sdfs = rt.$sdfs()
+var m = rt.$sdfs2mat()
+assert.strictEqual(m[0][0]._nd.$guid,sdfs[0].$guid)
+assert.strictEqual(m[1][0]._nd.$guid,sdfs[1].$guid)
+assert.strictEqual(m[2][0]._nd.$guid,sdfs[2].$guid)
+assert.strictEqual(m[2][1]._nd.$guid,sdfs[3].$guid)
+assert.strictEqual(m[2][2]._nd.$guid,sdfs[6].$guid)
+
+function gen_tree() {
+    var tree = new ndcls.Root()
+    var nd1 = tree.$append_child()
+    var nd2 = nd1.$append_child()
+    var nd3 = nd1.$append_child() 
+    var nd4 = nd3.$append_child()
+    var nd5 = nd4.$add_rsib() 
+    var nd6 = nd1.$add_rsib()
+    var nd7 = nd6.$prepend_child()
+    var nd8 = nd6.$append_child()
+    var nd9 = nd6.$append_child()
+    nd9.$append_children(6)
+    sh(tree.$dump())
 }
 
 */
