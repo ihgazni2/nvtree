@@ -12,7 +12,7 @@ usage
     ::
         const sh=require('ndtreejs').ndfuncterm.sdfs_show_root_tree 
         const ndcls = require('ndtreejs').ndcls
-        const wjson = require('ndtreejs').util.wjson         
+        const wjson = require('ndtreejs').ndutil.wjson         
 
         var tree = new ndcls.Root()
         var nd1 = tree.$append_child()
@@ -26,6 +26,23 @@ usage
         var nd9 = nd6.$append_child()
         nd9.$append_children(6)
         sh(tree.$dump())
+
+		[0] : 3920430b-0146-46fc-a003-628b0cd93bf0
+		├── [1] : 7f6f9004-c1c6-42ea-add6-96dc1b68ccc9
+		│   ├── [2] : 7d79b9bd-a5c8-4ac0-b14f-522d10c445b6
+		│   └── [3] : c36c5442-facd-4ee4-8e50-bc22fba5274b
+		│       ├── [4] : 29c40839-dd60-463e-a921-302fe4805fb1
+		│       └── [5] : ba13b031-8d91-45c7-bbed-f2271388c9e3
+		└── [6] : 334ef822-cfed-4734-afc6-2220bbc83187
+		    ├── [7] : 4723c3f9-ba82-4bf2-a546-bd1851acd4bb
+		    ├── [8] : 2b0f0325-6d91-48e7-896d-d7c981d82b1a
+		    └── [9] : 4eed11b9-fc73-4875-abdf-9f0cd74ba628
+			├── [10] : b245ee0a-a12b-4704-b1ec-8cc5204b4cb0
+			├── [11] : 2c64123f-60cb-407e-acda-793796742f7e
+			├── [12] : 145d75c5-1693-4757-850b-34338fe24941
+			├── [13] : 9d264f39-ab4a-46b1-9b1b-a326b03f370f
+			├── [14] : 02059d58-e938-475d-a563-01d7674bc529
+			└── [15] : f00889f5-0ee2-4fd1-b15b-0aadef6a4f58
         
         wjson('ndict.json',tree.$dump())               
         var ntree = ndcls.load('ndict.json') 
