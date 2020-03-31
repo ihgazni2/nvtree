@@ -1370,6 +1370,28 @@ function clone(nd) {
     return(load(ndict))
 }
 
+function _ele_struct_eq(ele0,ele1) {
+    return(
+        ele0._pbreadth === ele1._pbreadth &&
+        ele0._breadth === ele1._breadth &&
+        ele0._depth === ele1._depth
+    )
+}
+
+function struct_eq(tree0,tree1) {
+    let m0 = tree0.$sdfs2mat()
+    let m1 = tree1.$sdfs2mat()
+    let flat0 = Array.prototype.concat(...m0)
+    let flat1 = Array.prototype.concat(...m1)
+    if(flat0.length !== flat1.length) {
+        return(false)
+    } else {
+        for(let i=0;i<flat0.length;i++) {
+            if(_ele_struct_eq(ele0,ele1)) { } else {return(false)}
+        }
+    }
+    return(true)
+}
 
 module.exports = {
     Node:_Node,
@@ -1377,6 +1399,7 @@ module.exports = {
     Root:Tree,
     load:load,
     clone:clone,
+    struct_eq:struct_eq,
 }
 
 

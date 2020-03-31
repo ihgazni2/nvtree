@@ -84,6 +84,16 @@ function dcp(o) {
     return(JSON.parse(JSON.stringify(o)))
 }
 
+function mat_map(m,map_func) {
+    for(let i=0;i<m.length;i++) {
+        lyr = m[i]
+        for(let j=0;j<lyr.length;j++) {
+            m[i][j] = map_func(m[i][j],i,j)
+        } 
+    }
+    return(m)
+}
+
 
 module.exports = {
     gen_guid:gen_guid,
@@ -100,4 +110,5 @@ module.exports = {
     dtb_kv_rm,
     dtb_kv_get_seq,
     dcp:dcp,
+    mat_map:mat_map,
 }
