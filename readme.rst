@@ -129,6 +129,118 @@ METHODS
 - \$width
 
 
+TREE EXTRA METHODS
+==================
+
+A tree is a finite hierarchical tree structure. In tree order is preorder, depth-first traversal of a tree.
+
+- \$is_parent_of(nd)
+    
+    ::
+        
+        An object that participates in a tree has a parent, which is either null or an object, and has children, which is an ordered set of objects. An object A whose parent is object B is a child of B.
+
+
+- \$is_root_of(nd) 
+    
+    ::
+        
+        The root of an object is itself, if its parent is null, or else it is the root of its parent. The root of a tree is any object participating in that tree whose parent is null.
+
+
+
+- \$is_descendant_of(nd)
+    
+    ::
+        
+        An object A is called a descendant of an object B, if either A is a child of B or A is a child of an object C that is a descendant of B.        
+
+- \$is_inclusive_descendant_of(nd)
+    
+    ::
+        
+        An inclusive descendant is an object or one of its descendants.        
+        
+
+
+- \$is_ancestor_of(nd)
+    
+    ::
+        
+        An object A is called an ancestor of an object B if and only if B is a descendant of A.
+
+
+- \$is_inclusive_ancestor_of(nd)
+
+    ::
+
+        An inclusive ancestor is an object or one of its ancestors.
+
+
+
+- \$is_sibling_of(nd)
+
+    ::
+
+        An object A is called a sibling of an object B, if and only if B and A share the same non-null parent.
+
+
+
+- \$is_inclusive_siblings_of(nd)
+
+    ::
+
+        An inclusive sibling is an object or one of its siblings.
+
+
+- \$is_preceding_of(nd)
+
+    ::
+
+        An object A is preceding an object B if A and B are in the same tree and A comes before B in tree order.
+
+
+
+- \$is_following_of(nd)
+
+    ::
+
+        An object A is following an object B if A and B are in the same tree and A comes after B in tree order.
+
+
+- \$is_fstch_of(nd)
+
+    ::
+
+        The first child of an object is its first child or null if it has no children.
+
+- \$is_lstch_of(nd)
+
+    ::
+
+        The last child of an object is its last child or null if it has no children.
+
+
+- \$is_previous_sibling_of(nd)
+
+    ::
+
+        The previous sibling of an object is its first preceding sibling or null if it has no preceding sibling.
+
+
+
+- \$is_next_sibling_of(nd)
+
+    ::
+
+        The next sibling of an object is its first following sibling or null if it has no following sibling.
+
+- \$index()
+
+    ::
+
+        The index of an object is its number of preceding siblings, or 0 if it has none.
+
 APIS
 ====
 

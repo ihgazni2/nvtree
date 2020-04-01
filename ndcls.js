@@ -1351,6 +1351,75 @@ class Tree extends _Node {
         this._parent = null
         this._tree = this
     }
+    $is_parent_of(nd) {
+        let p = nd.$parent()
+        return(p===this)
+    }
+    $is_root_of(nd) {
+        let rt = nd.$root()
+        return(rt === this)
+    }
+    $is_descendant_of(nd) {
+        let deses = nd.$deses(including_self=false)
+        let index = deses.indexOf(this)
+        return(index >=0)
+    }
+    $is_inclusive_descendant_of(nd) {
+        let deses = nd.$deses(including_self=true)
+        let index = deses.indexOf(this)
+        return(index >=0)
+    }
+    $is_ancestor_of(nd) {
+        let ances = nd.$ances(including_self=false)
+        let index = ances.indexOf(this)
+        return(index >=0)         
+    }
+    $is_inclusive_ancestor_of(nd) {
+        let ances = nd.$ances(including_self=true)
+        let index = ances.indexOf(this)
+        return(index >=0) 
+    }
+    $is_sibling_of(nd) {
+        let sibs = nd.$sibs(including_self=false)
+        let index = sibs.indexOf(this)
+        return(index >=0)
+    }
+    $is_inclusive_siblings_of(nd) {
+        let sibs = nd.$sibs(including_self=true)
+        let index = sibs.indexOf(this)
+        return(index >=0)
+    }
+    $is_preceding_of(nd) {
+        let sdfs = nd.$sdfs()
+        let ndindex = sdfs.indexOf(nd)
+        let this_index = sdfs.indexof(this)
+        return(this_index>=0 && this_index < ndindex)
+    }
+    $is_following_of(nd) {
+        let sdfs = nd.$sdfs()
+        let ndindex = sdfs.indexOf(nd)
+        let this_index = sdfs.indexof(this)
+        return(this_index > ndindex)
+    }
+    $is_first_child_of(nd) {
+        return(this === nd.$fstch())
+    }
+    $is_last_child_of(nd) {
+        return(this === nd.$lstch())
+    }
+    $is_previous_sibling_of(nd) {
+        return(this === nd.$lsib())
+    }
+    $is_next_sibling_of(nd) {
+        return(this === nd.$rsib())
+    }
+    $index() {
+        return(this.$sibseq())    
+    } 
+    $sdfs_index() {
+        let sdfs = this.$sdfs()
+        return(sdfs.indexOf(this))
+    } 
 }
 
 function load(from) {
