@@ -1,6 +1,6 @@
 {
   "name": "ndtreejs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "node tree",
   "main": "index.js",
   "scripts": {
