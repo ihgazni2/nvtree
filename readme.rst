@@ -49,8 +49,8 @@ usage
         var ntree = ndcls.load('ndict.json') 
         
 
-METHODS
---------
+NODE METHODS
+------------
 
 - \$add_lsib
 - \$add_rsib
@@ -132,6 +132,7 @@ METHODS
 TREE EXTRA METHODS
 ==================
 
+refer to  https://dom.spec.whatwg.org/#concept-tree
 A tree is a finite hierarchical tree structure. In tree order is preorder, depth-first traversal of a tree.
 
 - \$is_parent_of(nd)
