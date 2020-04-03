@@ -1404,6 +1404,11 @@ class Tree extends _Node {
     $is_first_child_of(nd) {
         return(this === nd.$fstch())
     }
+    $is_child_of(nd) {
+        let children = nd.$children()
+        let index = children.indexOf(this)
+        return(index>=0)
+    }
     $is_last_child_of(nd) {
         return(this === nd.$lstch())
     }
@@ -1419,7 +1424,7 @@ class Tree extends _Node {
     $sdfs_index() {
         let sdfs = this.$sdfs()
         return(sdfs.indexOf(this))
-    } 
+    }
 }
 
 function load(from) {
