@@ -1293,7 +1293,19 @@ function _load(ndict) {
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
         } else if(nj._parent!==null && nj._parent!==undefined) {
+            //lstch,并且上一個節點是drmost-of-lsib
             let pid = nj._parent
+            prnd = _get_ancend_via_id(pid,prnd)
+            nd = prnd.$append_child()
+            nd._id = nj._id
+            nd.$guid = nj._guid
+            prnd = nd
+            prnj = nj
+            nj = ndfunc.get_sdfs_next(prnj,ndict)
+        } else if(nj._parent===undefined){
+            //非lstch,并且上一個節點是drmost-of-lsib
+            let lsibnj = ndfunc.get_lsib(nj,ndict)
+            let pid = lsibnj._parent
             prnd = _get_ancend_via_id(pid,prnd)
             nd = prnd.$append_child()
             nd._id = nj._id
