@@ -1198,6 +1198,12 @@ function get_some_deses(nd,nodes,...whiches) {
 
 
 //
+function get_root_via_tree(tree) {
+    let k = cmmn.dict_keys(ndict)[0]
+    let nd = tree[k]
+    let root = get_root(nd,tree)
+    return(root)
+}
 
 
 module.exports = {
@@ -1310,6 +1316,8 @@ module.exports = {
     add_rsib_tree,
     add_lsib_tree,
     insert_child_tree,
+    //
+    get_root_via_tree
 }
 
 

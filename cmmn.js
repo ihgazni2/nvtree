@@ -69,6 +69,18 @@ function dict_plus(d0,d1) {
     return(d0)    
 }
 
+function dict_update(d0,d1) {
+    //unique k ,no common k
+    for(let k in d1) {
+        let cond = !(k in d0)
+        if(cond) {
+            d0[k] =d1[k]
+        }    
+    }
+    return(d0)
+}
+
+
 
 function dtb_kv_rm(k,v,dtb) {
     dtb = dtb.filter(r=>(r[k]!==v))
@@ -107,6 +119,7 @@ module.exports = {
     dict_foreach:dict_foreach,
     dict_length:dict_length,
     dict_plus,
+    dict_update,
     dtb_kv_rm,
     dtb_kv_get_seq,
     dcp:dcp,

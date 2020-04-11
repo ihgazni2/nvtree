@@ -2,6 +2,8 @@ const ndutil = require('./util.js')
 const cmmn = require('./cmmn.js')
 const ndfunc = require('./ndfunc.js')
 const EventTarget = require('./event-target.js').EventTarget
+const STRUCT_KEYS = ['_fstch','_lsib','_rsib','_parent','_tree']
+
 
 function _is_inited(nd) {
     //被添加到了树上
@@ -1267,12 +1269,22 @@ function _get_ancend_via_id(id,nd) {
     return(nd)
 }
 
+function fill_other_attrs_for_load(nd,d) {
+    let other_ks = get_non_struct_keys(d)
+    for(let k of other_ks) {
+        nd[k] = d[k]
+    }
+    return(nd)
+}
+
+
 
 function _load(ndict) {
     //从一个json结构变成tree,返回root
     let k = cmmn.dict_keys(ndict)[0]
     let root = ndfunc.get_root(ndict[k],ndict)
     let rt = _rtjson2rt(root)
+    rt = fill_other_attrs_for_load(rt,root)
     let prnd = rt
     let prnj = root
     let nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1282,6 +1294,7 @@ function _load(ndict) {
             nd = prnd.$prepend_child()
             nd._id = nj._id
             nd.$guid = nj._guid
+            nd = fill_other_attrs_for_load(nd,d)
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1289,6 +1302,7 @@ function _load(ndict) {
             nd = prnd.$add_rsib()
             nd._id = nj._id
             nd.$guid = nj._guid
+            nd = fill_other_attrs_for_load(nd,d)
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1299,6 +1313,7 @@ function _load(ndict) {
             nd = prnd.$append_child()
             nd._id = nj._id
             nd.$guid = nj._guid
+            nd = fill_other_attrs_for_load(nd,d)
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1310,6 +1325,7 @@ function _load(ndict) {
             nd = prnd.$append_child()
             nd._id = nj._id
             nd.$guid = nj._guid
+            nd = fill_other_attrs_for_load(nd,d)
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1330,6 +1346,22 @@ function _dictize_nd_property(nd,k) {
     }
 }
 
+function get_non_struct_keys(nd) {
+    let all_ks = cmmn.dict_keys(nd)
+    let other_ks = all_ks.filter(
+        r=>!(STRUCT_KEYS.includes(r))
+    )
+    return(other_ks)
+}
+
+function fill_other_attrs_for_dump(nd,d) {
+    let other_ks = get_non_struct_keys(nd)
+    for(let k of other_ks) {
+        d[k] = nd[k]
+    }
+    return(d)
+}
+
 function _dump(rt) {
     //把一个nd结构变成json结构, 这个nd 相当于脱离了tree的一个deepcopy
     _set_id(rt)
@@ -1346,6 +1378,9 @@ function _dump(rt) {
             d._parent = _dictize_nd_property(nd,'_parent') 
             d._id = nd._id
             d._guid = nd.$guid
+            //
+            d = fill_other_attrs_for_dump(nd,d)
+            //
             nodes_dict[nd._id] = d
         }
     )
