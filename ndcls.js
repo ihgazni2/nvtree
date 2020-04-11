@@ -1294,7 +1294,7 @@ function _load(ndict) {
             nd = prnd.$prepend_child()
             nd._id = nj._id
             nd.$guid = nj._guid
-            nd = fill_other_attrs_for_load(nd,d)
+            nd = fill_other_attrs_for_load(nd,nj)
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1302,7 +1302,7 @@ function _load(ndict) {
             nd = prnd.$add_rsib()
             nd._id = nj._id
             nd.$guid = nj._guid
-            nd = fill_other_attrs_for_load(nd,d)
+            nd = fill_other_attrs_for_load(nd,nj)
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1313,7 +1313,7 @@ function _load(ndict) {
             nd = prnd.$append_child()
             nd._id = nj._id
             nd.$guid = nj._guid
-            nd = fill_other_attrs_for_load(nd,d)
+            nd = fill_other_attrs_for_load(nd,nj)
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
@@ -1325,7 +1325,7 @@ function _load(ndict) {
             nd = prnd.$append_child()
             nd._id = nj._id
             nd.$guid = nj._guid
-            nd = fill_other_attrs_for_load(nd,d)
+            nd = fill_other_attrs_for_load(nd,nj)
             prnd = nd
             prnj = nj
             nj = ndfunc.get_sdfs_next(prnj,ndict)
