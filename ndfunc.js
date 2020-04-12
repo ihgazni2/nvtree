@@ -1,6 +1,11 @@
+//
 const cmmn = require("./cmmn.js")
 
+//tree ndict nodes nnodes same
+
 //util
+
+
 
 function calc_next_id(nodes) {
     if(cmmn.is_empty_dict(nodes)){
@@ -1199,11 +1204,18 @@ function get_some_deses(nd,nodes,...whiches) {
 
 //
 function get_root_via_tree(tree) {
-    let k = cmmn.dict_keys(ndict)[0]
+    let k = cmmn.dict_keys(tree)[0]
     let nd = tree[k]
     let root = get_root(nd,tree)
     return(root)
 }
+
+function tree2sdfs(tree) {
+    let root = get_root_via_tree(tree)
+    let sdfs = get_sdfs(root,tree) 
+    return(sdfs)
+}
+
 
 
 module.exports = {
@@ -1317,7 +1329,8 @@ module.exports = {
     add_lsib_tree,
     insert_child_tree,
     //
-    get_root_via_tree
+    get_root_via_tree,
+    tree2sdfs,
 }
 
 
