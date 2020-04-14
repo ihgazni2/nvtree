@@ -72,7 +72,7 @@ function dflt_sdfs_calc_conns(nd,nodes) {
 
 function get_sdfs_repr_arr(nd,nodes,f){
     let depth = ndfunc.get_depth(nd,nodes)
-    let sdfs = ndfunc.get_deses(nd,nodes,including_self=true)
+    let sdfs = ndfunc.get_deses(nd,nodes,true)
     sdfs = sdfs.map(nd=>dflt_sdfs_calc_conns(nd,nodes))
     let conns_array = sdfs.map(nd=>nd._ui.conns)
     conns_array = conns_array.map(conns=>conns.slice(depth))
@@ -172,7 +172,7 @@ function get_edfs_repr_arr(nd,nodes,f){
     edfs.reverse()
     edfs = edfs.map(nd=>dflt_edfs_calc_conns(nd,nodes))
     edfs.reverse()
-    let deses = ndfunc.get_deses(nd,nodes,including_self=true)
+    let deses = ndfunc.get_deses(nd,nodes,true)
     let ids = deses.map(r=>r._id)
     edfs = edfs.filter(r=>ids.includes(r._id))
     let conns_array = edfs.map(nd=>nd._ui.conns)
@@ -268,13 +268,13 @@ function sedfs_show_all(nd,nodes,show_connd=dflt_sedfs_show_connd) {
 }
 
 function sdfs_expand(nd,nodes,f=dflt_sdfs_show_callback) {
-    let sdfs = ndfunc.get_deses(nd,nodes,including_self=false)
+    let sdfs = ndfunc.get_deses(nd,nodes,false)
     sdfs.forEach(nd=>{nd._ui.display = true})
     return(nodes)
 }
 
 function sdfs_foldup(nd,nodes,f=dflt_sdfs_show_callback) {
-    let sdfs = ndfunc.get_deses(nd,nodes,including_self=false)
+    let sdfs = ndfunc.get_deses(nd,nodes,false)
     sdfs.forEach(nd=>{nd._ui.display = false})
     return(nodes)
 }

@@ -544,7 +544,7 @@ function get_lstsib(nd,nodes,including_self=false) {
 
 
 function get_preceding_sibs(nd,nodes) {
-    let sibs = get_sibs(nd,nodes,including_self=true)
+    let sibs = get_sibs(nd,nodes,true)
     let seq = cmmn.dtb_kv_get_seq("_id",nd._id,sibs)
     let some = []
     if(sibs.length ===0) {
@@ -561,7 +561,7 @@ function get_preceding_sibs(nd,nodes) {
 }
 
 function get_following_sibs(nd,nodes) {
-    let sibs = get_sibs(nd,nodes,including_self=true)
+    let sibs = get_sibs(nd,nodes,true)
     let seq = cmmn.dtb_kv_get_seq("_id",nd._id,sibs)
     let some = []
     if(sibs.length ===0) {
@@ -594,7 +594,7 @@ function get_sibs(nd,nodes,including_self=false) {
 }
 
 function get_fstsib(nd,nodes,including_self=false) {
-    let sibs = get_sibs(nd,nodes,including_self=true)
+    let sibs = get_sibs(nd,nodes,true)
     if(including_self) {
         return(sibs[0])
     } else {
@@ -608,7 +608,7 @@ function get_fstsib(nd,nodes,including_self=false) {
 
 
 function get_which_sib(which,nd,nodes) {
-    let sibs = get_sibs(nd,nodes,including_self=true)
+    let sibs = get_sibs(nd,nodes,true)
     let lngth = sibs.length
     let cond = (which<=lngth-1) && (which >=0)
     if(cond) {
@@ -619,7 +619,7 @@ function get_which_sib(which,nd,nodes) {
 }
 
 function get_some_sibs(nd,nodes,...whiches) {
-    let sibs = get_sibs(nd,nodes,including_self=true)
+    let sibs = get_sibs(nd,nodes,true)
     let some = []
     if(sibs.length ===0) {
         
@@ -638,13 +638,13 @@ function get_some_sibs(nd,nodes,...whiches) {
 }
 
 function get_sibseq(nd,nodes) {
-    let sibs = get_sibs(nd,nodes,including_self=true)
+    let sibs = get_sibs(nd,nodes,true)
     let seq = cmmn.dtb_kv_get_seq("_id",nd._id,sibs)
     return(seq)
 }
 
 function get_lsib(nd,nodes) {
-    let sibs = get_sibs(nd,nodes,including_self=true)
+    let sibs = get_sibs(nd,nodes,true)
     let seq = cmmn.dtb_kv_get_seq("_id",nd._id,sibs)
     if(seq === 0) {
         return(null)
@@ -661,7 +661,7 @@ function get_rsib(nd,nodes) {
 //layer
 
 function get_depth(nd,nodes) {
-    let ances = get_ances(nd,nodes,including_self=true)
+    let ances = get_ances(nd,nodes,true)
     return(ances.length-1)
 }
 
@@ -769,7 +769,7 @@ function get_ances(nd,nodes,including_self=false) {
 }
 
 function get_which_ance(which,nd,nodes) {
-    let ances = get_ances(nd,nodes,including_self=true)
+    let ances = get_ances(nd,nodes,true)
     let lngth = ances.length
     let cond = (which<lngth) && (which>=0)
     if(cond) {
@@ -780,7 +780,7 @@ function get_which_ance(which,nd,nodes) {
 }
 
 function get_some_ances(nd,nodes,...whiches) {
-    let ances = get_ances(nd,nodes,including_self=true)
+    let ances = get_ances(nd,nodes,true)
     let some = []
     if(ances.length ===0) {
         
@@ -1180,7 +1180,7 @@ function get_fst_lyr_deses(nd,nodes) {
 }
 
 function get_lst_lyr_deses(nd,nodes) {
-    let deses = get_deses(nd,nodes,including_self=false)
+    let deses = get_deses(nd,nodes,false)
     let des_depths = sdfs.map(r=>get_depth(r,nodes))
     let max = Math.max(...des_depths)
     deses = deses.filter(r=>(get_depth(r,nodes)===max))
@@ -1189,7 +1189,7 @@ function get_lst_lyr_deses(nd,nodes) {
 
 function get_which_lyr_deses(which,nd,nodes) {
     let depth = get_depth(nd,nodes)
-    let deses = get_deses(nd,nodes,including_self=false)
+    let deses = get_deses(nd,nodes,false)
     let des_depths = sdfs.map(r=>get_depth(r,nodes))
     deses = deses.filter(r=>(get_depth(r,nodes)===(depth+which)))
     return(deses)

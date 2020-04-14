@@ -38,7 +38,7 @@ function _is_leaf(nd) {
 
 
 function _is_lonely(nd) {
-    let sibs = nd.$sibs(including_self=true)
+    let sibs = nd.$sibs(true)
     return(sibs.length === 1)
 }
 
@@ -166,7 +166,7 @@ function _fstsib(nd,including_self=false) {
 
 
 function _lsib(nd) {
-    let fstsib = _fstsib(nd,including_self=false)
+    let fstsib = _fstsib(nd,false)
     if(fstsib === null) {
         return(null)
     } else {
@@ -184,7 +184,7 @@ function _lsib(nd) {
 
 function _psibs(nd) {
     let psibs = []
-    let fstsib = _fstsib(nd,including_self=true)
+    let fstsib = _fstsib(nd,true)
     let sib = fstsib
     while(sib !== null) {
         if(sib === nd) {
@@ -221,7 +221,7 @@ function _sibs(nd,including_self=false) {
 
 
 function _which_sib(index,nd) {
-    let sib = _fstsib(nd,including_self=true)
+    let sib = _fstsib(nd,true)
     let c = 0
     while(true) {
         if(sib === null) {
@@ -237,7 +237,7 @@ function _which_sib(index,nd) {
 }
 
 function _some_sibs(nd,...indexes) {
-    let sibs = _sibs(nd,including_self=true) 
+    let sibs = _sibs(nd,true) 
     let some = sibs.filter(
         (r,i) => indexes.includes(i) 
     )
@@ -262,7 +262,7 @@ function _sibs_count(nd,including_self=false) {
 /*ance*/
 
 function _parent(nd) {
-    let lstsib = _lstsib(nd,including_self=true)
+    let lstsib = _lstsib(nd,true)
     return(lstsib._parent)
 }
 
@@ -306,7 +306,7 @@ function _ances(nd,including_self=false) {
 }
 
 function _some_ances(nd,...indexes) {
-    let ances = _ances(nd,including_self=true)
+    let ances = _ances(nd,true)
     let some = ances.filter(
         (r,i) => indexes.includes(i)
     )
@@ -418,7 +418,7 @@ function _deses(nd,including_self=false) {
 }
 
 function _lst_lyr_deses(nd) {
-    let deses = nd.$deses(including_self=false)
+    let deses = nd.$deses(false)
     let des_depths = deses.map(r=>r.$depth())
     let max = Math.max(...des_depths)
     deses = deses.filter(r=>(r.$depth()===max))
@@ -427,7 +427,7 @@ function _lst_lyr_deses(nd) {
 
 function _which_lyr_deses(index,nd) {
     let depth = nd.$depth()
-    let deses = nd.$deses(including_self=false)
+    let deses = nd.$deses(false)
     let des_depths = deses.map(r=>r.$depth())
     deses = deses.filter(r=>(r.$depth()===(depth+index)))
     return(deses)
@@ -436,7 +436,7 @@ function _which_lyr_deses(index,nd) {
 function _some_lyrs_deses(nd,...rel_depths) {
     let depth = nd.$depth()
     let abs_depths = rel_depths.map(r=>r+depth)
-    let deses = nd.$deses(including_self=false)
+    let deses = nd.$deses(false)
     let des_depths = deses.map(r=>r.$depth())
     deses = deses.filter(r=>(abs_depths.includes(r.$depth())))
     return(deses)
@@ -1122,8 +1122,8 @@ class _Node extends EventTarget {
         return(_sedfs(this))
     }
     //
-    $deses() {
-        return(_deses(this))
+    $deses(including_self=false) {
+        return(_deses(this,including_self))
     }
     $lst_lyr_deses() {
         return(_lst_lyr_deses(this))
@@ -1407,32 +1407,32 @@ class Tree extends _Node {
         return(rt === this)
     }
     $is_descendant_of(nd) {
-        let deses = nd.$deses(including_self=false)
+        let deses = nd.$deses(false)
         let index = deses.indexOf(this)
         return(index >=0)
     }
     $is_inclusive_descendant_of(nd) {
-        let deses = nd.$deses(including_self=true)
+        let deses = nd.$deses(true)
         let index = deses.indexOf(this)
         return(index >=0)
     }
     $is_ancestor_of(nd) {
-        let ances = nd.$ances(including_self=false)
+        let ances = nd.$ances(false)
         let index = ances.indexOf(this)
         return(index >=0)         
     }
     $is_inclusive_ancestor_of(nd) {
-        let ances = nd.$ances(including_self=true)
+        let ances = nd.$ances(true)
         let index = ances.indexOf(this)
         return(index >=0) 
     }
     $is_sibling_of(nd) {
-        let sibs = nd.$sibs(including_self=false)
+        let sibs = nd.$sibs(false)
         let index = sibs.indexOf(this)
         return(index >=0)
     }
     $is_inclusive_siblings_of(nd) {
-        let sibs = nd.$sibs(including_self=true)
+        let sibs = nd.$sibs(true)
         let index = sibs.indexOf(this)
         return(index >=0)
     }
