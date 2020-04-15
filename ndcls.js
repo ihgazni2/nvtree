@@ -1509,7 +1509,7 @@ function struct_eq(tree0,tree1) {
         return(false)
     } else {
         for(let i=0;i<flat0.length;i++) {
-            if(_ele_struct_eq(ele0,ele1)) { } else {return(false)}
+            if(_ele_struct_eq(flat0[i],flat1[i])) { } else {return(false)}
         }
     }
     return(true)
