@@ -1252,6 +1252,7 @@ function _set_id(nd) {
     tree.forEach(
         (nd,i) => {nd._id = i}
     )
+    return(tree)
 }
 
 
@@ -1364,8 +1365,8 @@ function fill_other_attrs_for_dump(nd,d) {
 
 function _dump(rt) {
     //把一个nd结构变成json结构, 这个nd 相当于脱离了tree的一个deepcopy
-    _set_id(rt)
-    let sdfs = rt.$sdfs()
+    let sdfs = _set_id(rt)
+    //let sdfs = rt.$sdfs()
     let treeid = rt._id
     let nodes_dict = {}
     sdfs.forEach(
