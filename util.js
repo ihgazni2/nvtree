@@ -13,8 +13,15 @@ function wjson(fn,js) {
 }
 
 
+function is_int_str(s) {
+    let n = parseInt(s)
+    let ns = n.toString()
+    return(ns === s)
+}
+
 
 module.exports = {
     rjson,
     wjson,
+    is_int_str,
 }
