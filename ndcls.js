@@ -43,6 +43,12 @@ function _is_lonely(nd) {
 }
 
 
+function _is_connectable(nd) {
+    return(_is_root(nd) || !_is_inited(nd))
+}
+
+
+
 /* child query*/
 
 //_fstch is always directly
@@ -446,6 +452,7 @@ function _some_lyrs_deses(nd,...rel_depths) {
 /*add node */
 
 function _prepend_child(nd,child) {
+    if(_is_connectable(child)) {} else { console.log('only root or uninited could be prepend');return(child)} 
     //只有根节点才可以被链接到另一颗树上
     let cond = nd.$is_leaf()
     child._tree = nd._tree
@@ -454,6 +461,7 @@ function _prepend_child(nd,child) {
         //child 也是lstch
         child._rsib = null
         child._parent = nd
+        //不改动fstch
     } else {
         //变更old_fstch
         let old_fstch = nd._fstch
@@ -461,7 +469,9 @@ function _prepend_child(nd,child) {
         old_fstch._lsib = undefined
         //更新child
         child._rsib = old_fstch
-        //添加child 
+        //child 不是lstch _parent 置为 未计算
+        child._parent = undefined
+        //不改动fstch
     }   
     nd._fstch = child
     return(child)
@@ -469,6 +479,7 @@ function _prepend_child(nd,child) {
 
 
 function _append_child(nd,child) {
+    if(_is_connectable(child)) {} else { console.log('only root or uninited could be prepend');return(child)}
     let cond = nd.$is_leaf() 
     child._tree = nd._tree
     child._rsib = null
@@ -476,12 +487,15 @@ function _append_child(nd,child) {
         //child 也是lstch
         nd._fstch = child
         child._lsib = null
+        //不改动child fstch 维持子树
     } else {
         //变更old_lstch
         let old_lstch = nd.$lstch() 
         //old_lstch 不再是lstch
         old_lstch._parent = undefined
         old_lstch._rsib = child
+        //child 不是fstch _lsib置为 undefined
+        child._lsib = undefined
     }
     child._parent = nd
     return(child)
@@ -490,6 +504,7 @@ function _append_child(nd,child) {
 
 
 function _add_rsib(nd,rsib) {
+    if(_is_connectable(rsib)) {} else { console.log('only root or uninited could be add');return(rsib)}
     //root 不可操作
     if(nd.$is_root()) {
         console.log("cant addrsib to root")
@@ -504,13 +519,18 @@ function _add_rsib(nd,rsib) {
         rsib._rsib = null
     } else {
         rsib._rsib = nd._rsib
+        rsib._parent = undefined
     }
     nd._rsib = rsib
+    //rsib 一定不是fstch
+    rsib._lsib = undefined
+    //
     return(rsib)
 }
 
 
 function _add_lsib(nd,lsib) {
+    if(_is_connectable(lsib)) {} else { console.log('only root or uninited could be add');return(lsib)}
     //root 不可操作
     if(nd.$is_root()) {
         console.log("cant addlsib to root")
@@ -527,8 +547,13 @@ function _add_lsib(nd,lsib) {
     } else {
         let old_lsib = nd.$lsib()
         old_lsib._rsib = lsib
+        //
+        lsib._lsib = undefined
     }
     lsib._rsib = nd
+    //lsib 一定不是lstch
+    lsib._parent = undefined
+    //
     return(lsib)
 }
 
@@ -1523,38 +1548,3 @@ module.exports = {
     clone:clone,
     struct_eq:struct_eq,
 }
-
-
-/*
-var ndcls = require('./ndcls')
-var sh=require('./ndfuncterm.js').sdfs_show_root_tree
-
-var rt = ndcls.load('./TEST/ndict.json')
-sh(rt.$dump())
-var sedfs = rt.$sedfs()
-rt.$sedfs_repr()
-
-var sdfs = rt.$sdfs()
-var m = rt.$sdfs2mat()
-assert.strictEqual(m[0][0]._nd.$guid,sdfs[0].$guid)
-assert.strictEqual(m[1][0]._nd.$guid,sdfs[1].$guid)
-assert.strictEqual(m[2][0]._nd.$guid,sdfs[2].$guid)
-assert.strictEqual(m[2][1]._nd.$guid,sdfs[3].$guid)
-assert.strictEqual(m[2][2]._nd.$guid,sdfs[6].$guid)
-
-function gen_tree() {
-    var tree = new ndcls.Root()
-    var nd1 = tree.$append_child()
-    var nd2 = nd1.$append_child()
-    var nd3 = nd1.$append_child() 
-    var nd4 = nd3.$append_child()
-    var nd5 = nd4.$add_rsib() 
-    var nd6 = nd1.$add_rsib()
-    var nd7 = nd6.$prepend_child()
-    var nd8 = nd6.$append_child()
-    var nd9 = nd6.$append_child()
-    nd9.$append_children(6)
-    sh(tree.$dump())
-}
-
-*/

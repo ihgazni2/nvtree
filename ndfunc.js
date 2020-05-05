@@ -127,6 +127,12 @@ function is_lonely(nd,nodes) {
     } 
 }
 
+function is_connectable(nd) {
+    return(is_root(nd) || !is_inited(nd))
+}
+
+
+
 /*
 function eq(nd0,nd1) {
     //id 必须完全一致
@@ -140,6 +146,7 @@ function eq(nd0,nd1) {
 //
 
 function prepend_child(nd,child,nodes) {
+    if(is_connectable(child)) {} else { console.log('only root or uninited could be prepend');return(nd)}
     //只有根节点才可以被链接到另一颗树上
     let cond = is_leaf(nd)
     child._tree = nd._tree
@@ -155,7 +162,10 @@ function prepend_child(nd,child,nodes) {
         old_fstch._lsib = undefined
         //更新child
         child._rsib = old_fstch._id
-        //添加child
+        //
+        //child 不是lstch _parent 置为 未计算
+        child._parent = undefined
+        //不改动fstch
     }
     nd._fstch = child._id
     nodes[child._id] = child
@@ -165,6 +175,8 @@ function prepend_child(nd,child,nodes) {
 
 
 function append_child(nd,child,nodes) {
+    if(is_connectable(child)) {} else { console.log('only root or uninited could be append');return(nd)}
+    //
     let cond = is_leaf(nd)
     child._tree = nd._tree
     child._rsib = null
@@ -178,6 +190,8 @@ function append_child(nd,child,nodes) {
         //old_lstch 不再是lstch
         old_lstch._parent = undefined
         old_lstch._rsib = child._id
+        //child 不是fstch _lsib置为 undefined
+        child._lsib = undefined
     }
     child._parent = nd._id
     nodes[child._id] = child
@@ -185,6 +199,7 @@ function append_child(nd,child,nodes) {
 }
 
 function add_rsib(nd,rsib,nodes) {
+    if(is_connectable(rsib)) {} else { console.log('only root or uninited could be add');return(nd)}
     //root 不可操作
     if(is_root(nd)) {
         console.log("cant addrsib to root")
@@ -199,13 +214,19 @@ function add_rsib(nd,rsib,nodes) {
         rsib._rsib = null
     } else {
         rsib._rsib = nd._rsib
+        rsib._parent = undefined
     }
     nd._rsib = rsib._id
+    //rsib 一定不是fstch
+    rsib._lsib = undefined
+    //
     nodes[rsib._id] = rsib
     return(nd)
 }
 
 function add_lsib(nd,lsib,nodes) {
+    //
+    if(is_connectable(lsib)) {} else { console.log('only root or uninited could be add');return(nd)}
     //root 不可操作
     if(is_root(nd)) {
         console.log("cant addlsib to root")
@@ -222,8 +243,13 @@ function add_lsib(nd,lsib,nodes) {
     } else {
         let old_lsib = get_lsib(nd,nodes)
         old_lsib._rsib = lsib._id
+        //
+        lsib._lsib = undefined
     }
     lsib._rsib = nd._id
+    //lsib 一定不是lstch
+    lsib._parent = undefined
+    //
     nodes[lsib._id] = lsib
     return(nd)
 }
@@ -1233,6 +1259,7 @@ module.exports = {
     is_leaf:is_leaf,
     is_lonely:is_lonely,
     is_id:is_id,
+    is_connectable:is_connectable,
     //insert 
     prepend_child:prepend_child,
     append_child:append_child,
