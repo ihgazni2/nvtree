@@ -479,7 +479,7 @@ function _prepend_child(nd,child) {
 
 
 function _append_child(nd,child) {
-    if(_is_connectable(child)) {} else { console.log('only root or uninited could be prepend');return(child)}
+    if(_is_connectable(child)) {} else { console.log('only root or uninited could be append');return(child)}
     let cond = nd.$is_leaf() 
     child._tree = nd._tree
     child._rsib = null
