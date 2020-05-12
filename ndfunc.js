@@ -1221,8 +1221,8 @@ function get_which_lyr_deses(which,nd,nodes) {
     return(deses)
 }
 
-function get_some_deses(nd,nodes,...whiches) {
-    let deses = whiches.map(which => get_which_deses(which,nd,nodes))
+function get_some_lyrs_deses(nd,nodes,...whiches) {
+    let deses = whiches.map(which => get_which_lyr_deses(which,nd,nodes))
     deses = Array.prototype.concat(...deses)
     return(deses)
 }
@@ -1322,7 +1322,7 @@ module.exports = {
     get_fst_lyr_deses:get_fst_lyr_deses,
     get_lst_lyr_deses:get_lst_lyr_deses,
     get_which_lyr_deses:get_which_lyr_deses,
-    get_some_deses:get_some_deses,
+    get_some_lyrs_deses:get_some_lyrs_deses,
     //mat
     nd2ele:nd2ele,
     sdfs2mat:sdfs2mat,
