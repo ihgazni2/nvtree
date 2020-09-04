@@ -983,7 +983,7 @@ function _mat_to_nest_dict(m,children_k='_children') {
             let children = chlocs.map(r=>m[r[0]][r[1]])
             for(let j=0;j<children.length;j++) {
                 let chele = children[j]
-                let chd = init_nest_dele_via_ele(chele,children_k)
+                let chd = _init_nest_dele_via_ele(chele,children_k)
                 d[children_k].push(chd)
                 let unhandled_ele = {d:chd,ele:chele}
                 next_unhandled.push(unhandled_ele)
