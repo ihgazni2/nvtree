@@ -127,7 +127,7 @@ NODE METHODS
 - \$which_lyr_deses
 - \$which_sib
 - \$width
-
+- \$nest_dict
 
 TREE EXTRA METHODS
 ==================
@@ -374,7 +374,7 @@ APIS
 		    gen_tag: [Function: gen_tag],
 		    sedfs_show_all: [Function: sedfs_show_all]
 		  },
-		  ndcls: { Node: [Function: Node], load: [Function: load] },
+		  ndcls: { Node: [Function: Node], load: [Function: load],load_from_nest_dict:[Function: load_from+nest_dict] },
 		  ndutil: {rjson: [Function: rjson], wjson [Function: wjson]}
 		}
 

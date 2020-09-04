@@ -954,6 +954,86 @@ function _sdfs2mat(sdfs) {
 }
 
 
+
+function _init_nest_dele_via_ele(ele,children_k='_children') {
+    let nd = ele._nd
+    let d = {}
+    d[children_k] = []
+    d.$guid = nd.$guid
+    for(let k in nd) {
+        let cond = cmmn.is_cu_property(k)
+        if(cond){
+            d[k] = nd[k]
+        }
+    }
+    return(d)
+}
+
+function _mat_to_nest_dict(m,children_k='_children') {
+    let ele = m[0][0]
+    let nest = _init_nest_dele_via_ele(ele,children_k)
+    let unhandled = [{d:nest,ele:ele}]
+    while(unhandled.length>0) {
+        let next_unhandled = []
+        for(let i=0;i<unhandled.length;i++) {
+            let orb = unhandled[i]
+            let d = orb.d
+            let ele = orb.ele
+            let chlocs = orb.ele._children
+            let children = chlocs.map(r=>m[r[0]][r[1]])
+            for(let j=0;j<children.length;j++) {
+                let chele = children[j]
+                let chd = init_nest_dele_via_ele(chele,children_k)
+                d[children_k].push(chd)
+                let unhandled_ele = {d:chd,ele:chele}
+                next_unhandled.push(unhandled_ele)
+            }
+        }
+        unhandled = next_unhandled
+    }
+    return(nest)
+}
+
+
+function _init_node_via_nest_dele(d,children_k='_children') {
+    let nd = new _Node()
+    if(d.$guid !== undefined) {nd.$guid = d.$guid}
+    for(let k in d) {
+        let cond = cmmn.is_cu_property(k) && (children_k !== k)
+        if(cond){
+            nd[k] = d[k]
+        }
+    }
+    return(nd)
+}
+
+
+
+function _load_from_nest_dict(nest,children_k='_children') {
+    let rt = _init_node_via_nest_dele(d,children_k)
+    let unhandled = [{d:nest,nd:rt}]
+    while(unhandled.length>0) {
+        let next_unhandled = []
+        for(let i=0;i<unhandled.length;i++) {
+            let d = unhandled[i].d
+            let nd = unhandled[i].nd
+            let children = d[children_k]
+            for(let j=0;j<children.length;j++) {
+                let chd = children[j]
+                let chnd = _init_node_via_nest_dele(chd,children_k)
+                nd.$append_child(chnd)
+                let unhandled_ele = {d:chd,nd:chnd}
+                next_unhandled.push(unhandled_ele)
+            }
+        }
+        unhandled = next_unhandled
+    }
+    return(rt)
+}
+
+
+
+
 /**/
 
 class _Node extends EventTarget {
@@ -1265,7 +1345,13 @@ class _Node extends EventTarget {
     //
     $sdfs2mat() {
         return(_sdfs2mat(_sdfs(this)))
-    }          
+    }
+    $nest_dict(children_k='_children') {
+        let m = _sdfs2mat(_sdfs(this))
+        let nest = _mat_to_nest_dict(m)
+        return(nest)
+    }
+    //
 }
 
 
@@ -1511,6 +1597,11 @@ function load(from) {
         return(new Tree())
     }
 }
+
+function load_from_nest_dict(nest,children_k='_children') {
+    return(_load_from_nest_dict(nest))
+}
+
 
 function clone(nd) {
     let ndcit = nd.$dump()

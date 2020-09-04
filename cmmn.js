@@ -107,6 +107,15 @@ function mat_map(m,map_func) {
 }
 
 
+function is_cu_property(prop) {
+    let cond0 = (prop[0] !== '_')
+    let cond1 = (prop[0] !== '$')
+    let cond = (cond0 && cond1)
+    return(cond)
+}
+
+
+
 module.exports = {
     gen_guid:gen_guid,
     range:range,
@@ -124,4 +133,5 @@ module.exports = {
     dtb_kv_get_seq,
     dcp:dcp,
     mat_map:mat_map,
+    is_cu_property:is_cu_property
 }
