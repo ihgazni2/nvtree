@@ -1348,7 +1348,7 @@ class _Node extends EventTarget {
     }
     $nest_dict(children_k='_children') {
         let m = _sdfs2mat(_sdfs(this))
-        let nest = _mat_to_nest_dict(m)
+        let nest = _mat_to_nest_dict(m,children_k)
         return(nest)
     }
     //
