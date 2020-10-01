@@ -1,15 +1,30 @@
-const fs = require("fs")
+let fs;
+
+try {
+    fs = require("fs")
+} catch(err) {
+    fs = undefined;
+}
+
 
 function rjson(fn) {
-    let buf = fs.readFileSync(fn)
-    let s = buf.toString()
-    let d = JSON.parse(s)
-    return(d)
+    if(fs) {
+        let buf = fs.readFileSync(fn)
+        let s = buf.toString()
+        let d = JSON.parse(s)
+        return(d)
+    } else {
+        return(undefined)
+    }
 }
 
 function wjson(fn,js) {
-    let s =JSON.stringify(js)
-    fs.writeFileSync(fn,s)
+    if(fs){
+        let s =JSON.stringify(js)
+        fs.writeFileSync(fn,s)
+    } else {
+        return(undefined)
+    }
 }
 
 
