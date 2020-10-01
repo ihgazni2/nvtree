@@ -1009,8 +1009,8 @@ function _init_node_via_nest_dele(d,children_k='_children') {
 
 
 
-function _load_from_nest_dict(d,children_k='_children') {
-    let rt = _init_node_via_nest_dele(d,children_k)
+function _load_from_nest_dict(nest,children_k='_children') {
+    let rt = _init_node_via_nest_dele(nest,children_k)
     let unhandled = [{d:nest,nd:rt}]
     while(unhandled.length>0) {
         let next_unhandled = []
