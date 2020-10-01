@@ -996,7 +996,7 @@ function _mat_to_nest_dict(m,children_k='_children') {
 
 
 function _init_node_via_nest_dele(d,children_k='_children') {
-    let nd = new _Node()
+    let nd = new Tree()
     if(d.$guid !== undefined) {nd.$guid = d.$guid}
     for(let k in d) {
         let cond = cmmn.is_cu_property(k) && (children_k !== k)
