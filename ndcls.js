@@ -1017,7 +1017,7 @@ function _load_from_nest_dict(d,children_k='_children') {
         for(let i=0;i<unhandled.length;i++) {
             let d = unhandled[i].d
             let nd = unhandled[i].nd
-            let children = d[children_k]
+            let children = (d[children_k] === undefined)?[]:d[children_k];
             for(let j=0;j<children.length;j++) {
                 let chd = children[j]
                 let chnd = _init_node_via_nest_dele(chd,children_k)
