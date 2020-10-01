@@ -1636,6 +1636,7 @@ module.exports = {
     Tree:Tree,
     Root:Tree,
     load:load,
+    load_from_nest_dict:load_from_nest_dict,
     clone:clone,
     struct_eq:struct_eq,
 }
