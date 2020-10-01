@@ -2,7 +2,7 @@
 function rjson(fn) {
     let cond = globalThis.document;
     if(cond === undefined) {
-        let fs = require('fs')
+        let fs = globalThis.require('fs')
         let buf = fs.readFileSync(fn)
         let s = buf.toString()
         let d = JSON.parse(s)
@@ -15,7 +15,7 @@ function rjson(fn) {
 function wjson(fn,js) {
     let cond = globalThis.document;
     if(cond === undefined){
-        let fs = require('fs')
+        let fs = globalThis.require('fs')
         let s =JSON.stringify(js)
         fs.writeFileSync(fn,s)
     } else {
