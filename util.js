@@ -14,7 +14,7 @@ function rjson(fn) {
 
 function wjson(fn,js) {
     let cond = globalThis.document;
-    if(cond){
+    if(cond === undefined){
         let fs = require('fs')
         let s =JSON.stringify(js)
         fs.writeFileSync(fn,s)
