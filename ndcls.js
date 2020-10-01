@@ -1599,7 +1599,7 @@ function load(from) {
 }
 
 function load_from_nest_dict(nest,children_k='_children') {
-    return(_load_from_nest_dict(nest))
+    return(_load_from_nest_dict(nest,children_k))
 }
 
 
