@@ -58,6 +58,7 @@ NODE METHODS
 - \$ances_count
 - \$append_child
 - \$append_children
+- \$pbreadth
 - \$breadth
 - \$children
 - \$children_count

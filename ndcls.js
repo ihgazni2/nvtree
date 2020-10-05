@@ -378,6 +378,14 @@ function _lyr(nd) {
 
 /**/
 
+function _pbreadth(nd) {
+    let p = nd.$parent()
+    if(p===null) {
+        return(null)
+    } else {
+        return(p.$breadth())
+    }
+}
 
 function _breadth(nd) {
     let lyr = nd.$lyr()
@@ -1253,6 +1261,9 @@ class _Node extends EventTarget {
         let max = Math.max(...des_depths)
         return(max-depth+1)        
     }
+    $pbreadth() {
+        return(_pbreadth(this))
+    }
     $breadth() {
         return(_breadth(this))
     }
@@ -1608,28 +1619,76 @@ function clone(nd) {
     return(load(ndict))
 }
 
-function _ele_struct_eq(ele0,ele1) {
-    return(
-        ele0._pbreadth === ele1._pbreadth &&
-        ele0._breadth === ele1._breadth &&
-        ele0._depth === ele1._depth
-    )
+//struct
+function get_cu_sign(nd,cu_sign_func,...args) {
+    let out = cu_sign_func(nd,...args)
+    out=  new Buffer.from(out).toString('base64')
+    return(out)    
 }
 
-function struct_eq(tree0,tree1) {
-    let m0 = tree0.$sdfs2mat()
-    let m1 = tree1.$sdfs2mat()
-    let flat0 = Array.prototype.concat(...m0)
-    let flat1 = Array.prototype.concat(...m1)
-    if(flat0.length !== flat1.length) {
+function get_internal_sign_ignore_order(nd) {
+    let internal = nd.$ances(true).map(r=>r.$children().length)
+    internal = internal.join('-')
+    return(internal)
+}
+
+function get_internal_sign_keep_order(nd) {
+    let internal = nd.$pbreadth()+'-'+nd.$breadth()+'-'+nd.$depth()
+    return(internal)
+}
+
+
+function get_sign_ignore_order(nd,cu_sign_func,...args) {
+    let sign = get_internal_sign_ignore_order(nd)
+    if(cu_sign_func){
+        out = get_cu_sign(nd,cu_sign_func,...args)
+        sign = sign + '@' + out
+    } 
+    return(sign)
+}
+
+function get_sign_keep_order(nd,cu_sign_func,...args) {
+    let sign = get_internal_sign_keep_order(nd)
+    if(cu_sign_func){
+        out = get_cu_sign(nd,cu_sign_func,...args)
+        sign = sign + '@' + out
+    }
+    return(sign)
+}
+
+
+function struct_eq(reorder,sign_func,tree0,tree1,cu_sign_func,...args) {
+    let sdfs0 = tree0.$sdfs()
+    let sdfs1 = tree1.$sdfs()
+    if(sdfs0.length !== sdfs1.length){
         return(false)
     } else {
-        for(let i=0;i<flat0.length;i++) {
-            if(_ele_struct_eq(flat0[i],flat1[i])) { } else {return(false)}
+        let signs0 = sdfs0.map(nd=>sign_func(nd,cu_sign_func,...args))
+        let signs1 = sdfs1.map(nd=>sign_func(nd,cu_sign_func,...args))
+        if(reorder) {
+            signs0.sort()
+            signs1.sort()
+        }
+        for(let i=0;i<signs0.length;i++) {
+            let sign0 = signs0[i]
+            let sign1 = signs1[i]
+            if(sign0 !== sign1){
+                return(false)
+            }
         }
     }
     return(true)
 }
+
+function struct_eq_keep_order(tree0,tree1,cu_sign_func,...args) {
+    return(struct_eq(false,get_sign_keep_order,tree0,tree1,cu_sign_func,...args))
+}
+
+function struct_eq_ignore_order(tree0,tree1,cu_sign_func,...args) {
+    return(struct_eq(true,get_sign_ignore_order,tree0,tree1,cu_sign_func,...args))
+}
+
+//
 
 module.exports = {
     Node:_Node,
@@ -1638,5 +1697,12 @@ module.exports = {
     load:load,
     load_from_nest_dict:load_from_nest_dict,
     clone:clone,
+    get_cu_sign,
+    get_internal_sign_ignore_order,
+    get_internal_sign_keep_order,
+    get_sign_keep_order,
     struct_eq:struct_eq,
+    struct_eq_keep_order:struct_eq_keep_order,
+    get_sign_ignore_order,
+    struct_eq_ignore_order:struct_eq_ignore_order,
 }
