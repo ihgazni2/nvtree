@@ -1,6 +1,6 @@
 {
   "name": "ndtreejs",
-  "version": "1.3.6",
+  "version": "1.3.9",
   "description": "node tree",
   "main": "index.js",
   "scripts": {
@@ -8,12 +8,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/navegador5/nvnode.git"
+    "url": "git+https://github.com/navegador5/nvtree.git"
   },
+  "keywords":["tree","dfs","depth-first","node-tree"],
   "author": "dli",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/navegador5/nvnode/issues"
+    "url": "https://github.com/navegador5/nvtree/issues"
   },
-  "homepage": "https://github.com/navegador5/nvnode#readme"
+  "homepage": "https://github.com/navegador5/nvtree#readme"
 }
