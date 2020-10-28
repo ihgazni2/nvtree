@@ -1039,7 +1039,23 @@ function _load_from_nest_dict(nest,children_k='_children') {
     return(rt)
 }
 
-
+//
+function init_internal_prop(instance) {
+    let iks = ["_fstch","_lsib","_rsib","_parent","_tree","$guid","_guid","_id","$open_at","$close_at"]
+    instance._fstch = undefined
+    instance._lsib = undefined
+    instance._rsib = undefined
+    instance._parent = undefined
+    instance._tree = undefined
+    instance.$guid = undefined
+    instance._guid = undefined
+    instance._id = undefined
+    instance.$open_at = undefined
+    instance.$close_at = undefined
+    for(let k of iks) {
+        Object.defineProperty(instance,k,{enumerable:false})
+    }
+}
 
 
 /**/
@@ -1047,12 +1063,9 @@ function _load_from_nest_dict(nest,children_k='_children') {
 class _Node extends EventTarget {
     constructor() {
         super();
-        this._fstch = null
-        this._lsib = undefined
-        this._rsib = undefined
-        this._parent = undefined
-        this._tree = undefined
-        this.$guid = cmmn.gen_guid()
+        init_internal_prop(this);
+        this._fstch = null;
+        this.$guid = cmmn.gen_guid();
     }
     $is_inited() {
         return(_is_inited(this))
