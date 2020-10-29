@@ -1057,6 +1057,32 @@ function init_internal_prop(instance) {
     }
 }
 
+/**/
+
+
+function dflt_sdfs_repr(nd,i,all_sdfs) {
+    let depth = nd.$depth()
+    let indent = '    '.repeat(depth)
+    let s = indent+'['+all_sdfs.indexOf(nd)+']'+' : '+nd.$guid
+    return(s)
+}
+
+function dflt_sedfs_repr(nd,i) {
+    let depth = nd.$depth()
+    let indent = '    '.repeat(depth)
+    let s = ''
+    if(i === nd.$open_at)  {
+        s = indent + '<'+nd._id+' : ' + nd.$guid +'>'
+        //include stag scontent
+    }
+    if(i === nd.$close_at)  {
+        s = indent + '</'+nd._id+' : ' +nd.$guid +'>'
+        //include etag econtent
+    }
+    //prepend indent
+    return(s)
+}
+
 
 /**/
 
@@ -1301,30 +1327,25 @@ class _Node extends EventTarget {
         return(_runcle(this))
     }
     //
-    $sdfs_repr() {
+    $sdfs_repr(fn=dflt_sdfs_repr,rtrn=false) {
         let rt = this.$root()
-        let tree = _sdfs(rt)
+        let all_sdfs = _sdfs(rt)
         let sdfs = _sdfs(this)
-        let depths = sdfs.map(nd=>nd.$depth()) 
-        let indents = depths.map(depth=>'    '.repeat(depth))
-        indents.forEach((indent,i)=>{console.log(indent+'['+tree.indexOf(sdfs[i])+']'+' : '+sdfs[i].$guid)})    
+        let rslts = sdfs.map((nd,i)=> fn(nd,i,all_sdfs))
+        let s = rslts.join('\n')
+        console.log(s)
+        if(rtrn) {return(s)} else {}
     }
-    $sedfs_repr() {
+    $sedfs_repr(fn=dflt_sedfs_repr,rtrn=false) {
         let rt = this.$root()
         _set_id(rt)       
         let sedfs = _sedfs(this)
-        sedfs.forEach(
-            (nd,i)=> {
-                let depth = nd.$depth()
-                let indent = '    '.repeat(depth)
-                if(i === nd.$open_at)  {
-                    console.log(indent+'<'+nd._id+' : ' + nd.$guid +'>')
-                }
-                if(i === nd.$close_at)  {
-                    console.log(indent+'</'+nd._id+' : ' +nd.$guid +'>')
-                }                               
-            }
+        let rslts = sedfs.map(
+            (nd,i)=> fn(nd,i)
         )
+        let s = rslts.join('\n')
+        console.log(s)
+        if(rtrn) {return(s)} else {}
     }
     //
     $disconn() {
@@ -1374,6 +1395,16 @@ class _Node extends EventTarget {
         let m = _sdfs2mat(_sdfs(this))
         let nest = _mat_to_nest_dict(m,children_k)
         return(nest)
+    }
+    //
+    $index() {
+        return(this.$sibseq())
+    }
+    $sdfs_index() {
+        //let sdfs = this.$sdfs()
+        let rt = this.$root()
+        let sdfs = rt.$sdfs()
+        return(sdfs.indexOf(this))
     }
     //
 }
@@ -1605,7 +1636,9 @@ class Tree extends _Node {
         return(this.$sibseq())    
     } 
     $sdfs_index() {
-        let sdfs = this.$sdfs()
+        let rt = this.$root()
+        let sdfs = rt.$sdfs()
+        //let sdfs = this.$sdfs()
         return(sdfs.indexOf(this))
     }
 }
