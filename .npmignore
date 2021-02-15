@@ -2,3 +2,6 @@ TOOL/
 dist/
 TEST/
 DRAFT/
+TODO/
+webpack.config.js
+readme.rst
