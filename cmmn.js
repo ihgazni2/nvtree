@@ -22,9 +22,6 @@ function seqs_slct(seqs,arr) {
 }
 
 
-function dict_length(d) {
-    return(Object.entries(d).length)
-}
 
 function is_empty_dict(d) {
     return(Object.entries(d).length === 0)
