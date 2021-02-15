@@ -1409,6 +1409,8 @@ class _Node extends EventTarget {
     //
 }
 
+Object.defineProperty(_Node,"name",{value:"\u200d"})
+
 
 /**/
 
@@ -1555,6 +1557,8 @@ function _dump(rt) {
 }
 
 
+
+
 class Tree extends _Node {
     constructor() {
         super();
@@ -1642,6 +1646,9 @@ class Tree extends _Node {
         return(sdfs.indexOf(this))
     }
 }
+
+Object.defineProperty(Tree,"name",{value:"\u200d"});
+
 
 function load(from) {
     if(typeof(from) === 'string') {

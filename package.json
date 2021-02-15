@@ -21,5 +21,11 @@
   "bugs": {
     "url": "https://github.com/navegador5/nvtree/issues"
   },
-  "homepage": "https://github.com/navegador5/nvtree#readme"
+  "homepage": "https://github.com/navegador5/nvtree#readme",
+  "dependencies": {
+    "nv-facutil-basic": "^1.0.7",
+    "nv-facutil-defp": "^1.0.0",
+    "nv-facutil-name": "^1.0.3",
+    "uuid": "^8.3.2"
+  }
 }

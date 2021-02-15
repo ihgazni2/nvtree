@@ -126,7 +126,6 @@ module.exports = {
     dict_keys:dict_keys,
     dict_map:dict_map,
     dict_foreach:dict_foreach,
-    dict_length:dict_length,
     dict_plus,
     dict_update,
     dtb_kv_rm,
