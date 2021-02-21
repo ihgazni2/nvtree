@@ -1,7 +1,7 @@
 const ndutil = require('./util.js')
 const cmmn = require('./cmmn.js')
 const ndfunc = require('./ndfunc.js')
-const EventTarget = require('./event-target.js').EventTarget
+const {ET} = require("nv-facutil-event")
 const STRUCT_KEYS = ['_fstch','_lsib','_rsib','_parent','_tree']
 
 
@@ -1086,13 +1086,14 @@ function dflt_sedfs_repr(nd,i) {
 
 /**/
 
-class _Node extends EventTarget {
+class _Node {
+    #et = new ET();
     constructor() {
-        super();
         init_internal_prop(this);
         this._fstch = null;
         this.$guid = cmmn.gen_guid();
     }
+    get et() {return(this.#et)}
     $is_inited() {
         return(_is_inited(this))
     }
@@ -1407,9 +1408,12 @@ class _Node extends EventTarget {
         return(sdfs.indexOf(this))
     }
     //
+    [Symbol.iterator]() {return(this.$sdfs()[Symbol.iterator]())}
+    get [Symbol.toStringTag]() { return(this.$guid.substr(0,8))}
 }
 
 Object.defineProperty(_Node,"name",{value:"\u200d"})
+
 
 
 /**/

@@ -96,12 +96,12 @@ function sdfs_show_all(nd,nodes,f=dflt_sdfs_show_callback){
     clear_ui(nodes)
 }
 
-function sdfs_show_root_tree(nodes,f=dflt_sdfs_show_callback){
+function sdfs_show_root_tree(nodes,rtrn=false,f=dflt_sdfs_show_callback){
     let k = cmmn.dict_keys(nodes)[0]
     let nd = ndfunc.get_root(nodes[k],nodes)
     let arr = get_sdfs_repr_arr(nd,nodes,f)
     let repr = arr.join('\n')
-    console.log(repr)
+    if(rtrn) {console.log(repr)}
     clear_ui(nodes)
 }
 

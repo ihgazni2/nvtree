@@ -1,4 +1,16 @@
-const {v4} = require("uuid");
+
+function gen_guid() {
+    return(
+        'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
+            /[xy]/g,
+            function(c) {
+                let r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8)
+                return(v.toString(16))
+            }
+         )
+    )
+}
+
 
 
 function range(si,ei) {
@@ -102,7 +114,7 @@ function is_cu_property(prop) {
 
 
 module.exports = {
-    gen_guid:v4,
+    gen_guid:gen_guid,
     range:range,
     seqs_slct:seqs_slct,
     dict_length:dict_length,

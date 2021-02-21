@@ -23,9 +23,7 @@
   },
   "homepage": "https://github.com/navegador5/nvtree#readme",
   "dependencies": {
-    "nv-facutil-basic": "^1.0.7",
-    "nv-facutil-defp": "^1.0.0",
-    "nv-facutil-name": "^1.0.3",
+    "nv-facutil-event": "^1.0.0",
     "uuid": "^8.3.2"
   }
 }

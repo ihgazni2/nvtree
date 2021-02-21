@@ -3,5 +3,6 @@ dist/
 TEST/
 DRAFT/
 TODO/
+BAK/
 webpack.config.js
 readme.rst
