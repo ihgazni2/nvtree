@@ -376,38 +376,6 @@ APIS
 >         add_lsib_tree: [Function: add_lsib_tree],
 >         insert_child_tree: [Function: insert_child_tree]
 >       },
->       ndfuncterm: {
->         dflt_calc_conn_map_func: [Function: dflt_calc_conn_map_func],
->         conns2repr: [Function: conns2repr],
->         clear_ui: [Function: clear_ui],
->         dflt_sdfs_show_connd: { t: '├── ', v: '│   ', l: '└── ', ws: '    ' },
->         dflt_sdfs_calc_conns: [Function: dflt_sdfs_calc_conns],
->         get_sdfs_repr_arr: [Function: get_sdfs_repr_arr],
->         sdfs_show_all: [Function: sdfs_show_all],
->         sdfs_show_root_tree: [Function: sdfs_show_root_tree],
->         sdfs_show_from: [Function: sdfs_show_from],
->         sdfs_show_to: [Function: sdfs_show_to],
->         sdfs_show_from_to: [Function: sdfs_show_from_to],
->         sdfs_expand: [Function: sdfs_expand],
->         sdfs_foldup: [Function: sdfs_foldup],
->         dflt_edfs_show_connd: { t: '├── ', v: '│   ', l: '┌── ', ws: '    ' },
->         dflt_edfs_calc_conns: [Function: dflt_edfs_calc_conns],
->         get_edfs_repr_arr: [Function: get_edfs_repr_arr],
->         edfs_show_all: [Function: edfs_show_all],
->         edfs_show_root_tree: [Function: edfs_show_root_tree],
->         edfs_show_from: [Function: edfs_show_from],
->         edfs_show_to: [Function: edfs_show_to],
->         edfs_show_from_to: [Function: edfs_show_from_to],
->         dflt_sedfs_show_connd: {
->           indent: '    ',
->           stag_prefix: '<',
->           stag_suffix: '>',
->           etag_prefix: '</',
->           etag_suffix: '>'
->         },
->         gen_tag: [Function: gen_tag],
->         sedfs_show_all: [Function: sedfs_show_all]
->       },
 >       ndcls: { Node: [Function: Node], load: [Function: load],load_from_nest_dict:[Function: load_from+nest_dict] },
 >       ndutil: {rjson: [Function: rjson], wjson [Function: wjson]}
 >     }
