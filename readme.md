@@ -205,6 +205,11 @@ NODE METHODS
 -   \$which\_sib
 -   \$width
 -   \$nest\_dict
+-   \$sdfs\_next\_action\_for\_srch
+-   \$sdfs\_srch\_action\_list
+-   et                             
+-   regis\_recv\_from\_handler
+-   send\_to
 
 TREE EXTRA METHODS
 ------------------
