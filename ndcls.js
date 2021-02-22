@@ -1084,7 +1084,70 @@ function dflt_sedfs_repr(nd,i) {
 }
 
 
+//action
+
+
+const SDFS_NEXT_SRCH_ACTIONS = ['$fstch','$rsib','$parent']
+
+function _sdfs_next_action_for_srch(nd) {
+    let fstch = nd.$fstch()
+    if(fstch !== null) {
+        return(['$fstch'])
+    } else {
+        let rsib = nd.$rsib()
+        if(rsib !== null) {
+            return(['$rsib'])
+        } else {
+            let action = []
+            let p = nd.$parent()
+            while(p!==null) {
+                action.push('$parent');
+                let rsib = p.$rsib()
+                if(rsib !== null) {
+                    action.push('$rsib');
+                    break;
+                } else {
+                   p = p.$parent()
+                }
+           }
+           return(action)
+        }
+    }
+}
+
+function _sdfs_srch_action_list(nd) {
+    let sdfs = nd.$sdfs()
+    let al = sdfs.map(nd=>nd.$sdfs_next_action_for_srch())
+    return(al)
+}
+
+const SDFS_NEXT_BUILD_ACTION_DICT = {
+    '$fstch':'$append_child',
+    '$rsib':'$add_rsib',
+    '$parent':'$parent'
+}
+
+function _build_from_srch_action(nd,action) {
+    for(let j=0;j<action.length;j++) {
+        let build_act = SDFS_NEXT_BUILD_ACTION_DICT[action[j]]
+        nd = nd[build_act]();
+    }
+    return(nd)
+}
+
+function build_from_srch_action_list(al) {
+    let rt = new Tree()
+    let nd = rt
+    for(let i=0;i<al.length;i++) {
+        let action = al[i]
+        nd = _build_from_srch_action(nd,action)
+    }
+    return(rt)
+}
+
+
 /**/
+
 
 class _Node {
     #et = new ET();
@@ -1094,6 +1157,11 @@ class _Node {
         this.$guid = cmmn.gen_guid();
     }
     get et() {return(this.#et)}
+    regis_recv_from_handler(handler) {
+        let _handler = function (e) {handler(e.data.src,e.data.msg)}
+        this.et.addEventListener('$msg__',_handler)
+    }
+    send_to(nd,msg) {nd.et.dispatch('$msg__',{src:this,msg:msg})}
     $is_inited() {
         return(_is_inited(this))
     }
@@ -1406,6 +1474,21 @@ class _Node {
         let rt = this.$root()
         let sdfs = rt.$sdfs()
         return(sdfs.indexOf(this))
+    }
+    //
+    $sdfs_next_action_for_srch() {
+        return(_sdfs_next_action_for_srch(this))
+    }
+    $sdfs_srch_action_list() {
+        return(_sdfs_srch_action_list(this))
+    }
+    //
+    $get_node_with_action(action) {
+        let nd = this;
+        for(let i=0;i<action.length;i++) {
+            nd = nd[action[i]]()
+        }
+        return(nd)
     }
     //
     [Symbol.iterator]() {return(this.$sdfs()[Symbol.iterator]())}
@@ -1748,6 +1831,10 @@ function struct_eq_ignore_order(tree0,tree1,cu_sign_func,...args) {
 //
 
 module.exports = {
+    SDFS_NEXT_BUILD_ACTION_DICT,
+    build_from_srch_action_list,
+    SDFS_NEXT_SRCH_ACTIONS,
+    RESERVED_EVENT_TYPES:['$msg__'],
     Node:_Node,
     Tree:Tree,
     Root:Tree,

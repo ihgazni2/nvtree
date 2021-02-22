@@ -25,5 +25,12 @@
   "dependencies": {
     "nv-facutil-event": "^1.0.0",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.17",
+    "@babel/preset-env": "^7.12.17",
+    "@babel/preset-typescript": "^7.12.17",
+    "babel-loader": "^8.2.2",
+    "webpack": "^5.23.0"
   }
 }
