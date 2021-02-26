@@ -207,6 +207,7 @@ NODE METHODS
 -   \$nest\_dict
 -   \$sdfs\_next\_action\_for\_srch
 -   \$sdfs\_srch\_action\_list
+-   \$replace\_with
 -   et                             
 -   regis\_recv\_from\_handler
 -   send\_to

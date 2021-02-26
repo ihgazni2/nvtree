@@ -1146,6 +1146,26 @@ function build_from_srch_action_list(al) {
 }
 
 
+function _replace_with(that,nd,deep_copy) {
+    if(deep_copy) {nd = nd.$clone()} 
+    if(that.$is_root()){
+    } else if(that.$is_lonely()) {
+        let p = that.$parent();
+        that.$disconn();
+        p.$append_child(nd);
+    } else if(that.$is_lstch()) {
+        let lsib = that.$lsib();
+        that.$disconn();
+        lsib.$add_rsib(nd);
+    } else {
+        let rsib = that.$rsib();
+        that.$disconn();
+        rsib.$add_lsib(nd);
+    }
+    return(nd)
+}
+
+
 /**/
 
 
@@ -1491,6 +1511,10 @@ class _Node {
         return(nd)
     }
     //
+    $replace_with(nd,deep_copy=true) {
+        return(_replace_with(this,nd,deep_copy))
+    }
+    //
     [Symbol.iterator]() {return(this.$sdfs()[Symbol.iterator]())}
     get [Symbol.toStringTag]() { return(this.$guid.substr(0,8))}
 }
@@ -1722,15 +1746,6 @@ class Tree extends _Node {
     }
     $is_next_sibling_of(nd) {
         return(this === nd.$rsib())
-    }
-    $index() {
-        return(this.$sibseq())    
-    } 
-    $sdfs_index() {
-        let rt = this.$root()
-        let sdfs = rt.$sdfs()
-        //let sdfs = this.$sdfs()
-        return(sdfs.indexOf(this))
     }
 }
 
