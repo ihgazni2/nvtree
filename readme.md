@@ -123,6 +123,12 @@ get structure
                 [15] : 09e34bb7-9768-4c43-af7c-e5f5b5f648e5
 
 
+SDFS,EDFS,SEDFS
+===============
+- sdfs is dfs-preorder , it could be used for things such as "scope"
+- sedfs just like html-sequence, enter/begin-.....-end/leave, it could be used for things such as "parse"
+- edfs is dfs-postorder, normally it is USELESS , it could be used for things such as "execution" when leaf-node could be treated as "instructions"
+- $replace method normally should be used together with edfs, it is for deep-copy a "template-tree" and replace itself with this "template-tree", it could be used fro things such as "call"
 
 
 NODE METHODS
