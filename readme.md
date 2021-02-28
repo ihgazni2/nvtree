@@ -128,7 +128,27 @@ SDFS,EDFS,SEDFS
 - sdfs is dfs-preorder , it could be used for things such as "scope"
 - sedfs just like html-sequence, enter/begin-.....-end/leave, it could be used for things such as "parse"
 - edfs is dfs-postorder, normally it is USELESS , it could be used for things such as "execution" when leaf-node could be treated as "instructions"
-- $replace method normally should be used together with edfs, it is for deep-copy a "template-tree" and replace itself with this "template-tree", it could be used fro things such as "call"
+- $replace method normally should be used together with edfs, it is for deep-copy a "template-tree" and replace itself with this "template-tree", it could be used for things such as "call"
+
+
+DIFF
+=====
+- struct\_eq\_ignore\_order is slow,  but it can recognize tree-topology-only difference
+- struct\_eq\_keep\_order  is fast ,but it can NOT  recognize real similarity 
+- notmally USELESS , but useful when with non-standard nested-input, such as  {a=b,B:c,<1,2,3,4,5>} mixed-style structure
+
+
+APIS
+----
+
+- get\_cu\_sign
+- get\_internal\_sign\_ignore\_order
+- get\_internal\_sign\_keep\_order
+- get\_sign\_ignore\_order
+- get\_sign\_keep\_order
+- struct\_eq\_keep\_order
+- struct\_eq\_ignore\_order
+
 
 
 NODE METHODS
