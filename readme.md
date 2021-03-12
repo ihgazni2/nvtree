@@ -234,9 +234,14 @@ NODE METHODS
 -   \$sdfs\_next\_action\_for\_srch
 -   \$sdfs\_srch\_action\_list
 -   \$replace\_with
+-   \$sdfs\_leafs
+-   \$sdfs\_nonleafs
+-   \$sdfs\_leaf\_index
+-   \$sdfs\_nonleaf\_index
 -   et                             
 -   regis\_recv\_from\_handler
 -   send\_to
+
 
 TREE EXTRA METHODS
 ------------------

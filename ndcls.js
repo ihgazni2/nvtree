@@ -1490,10 +1490,27 @@ class _Node {
         return(this.$sibseq())
     }
     $sdfs_index() {
-        //let sdfs = this.$sdfs()
         let rt = this.$root()
         let sdfs = rt.$sdfs()
         return(sdfs.indexOf(this))
+    }
+    $sdfs_leafs() {
+        let rt = this.$root();
+        let sdfs = rt.$sdfs();
+        let leafs = sdfs.filter(nd=>nd.$is_leaf());
+        return(leafs)
+    }
+    $sdfs_nonleafs() {
+        let rt = this.$root();
+        let sdfs = rt.$sdfs();
+        let nonleafs = sdfs.filter(nd=>!nd.$is_leaf());
+        return(nonleafs)
+    }
+    $sdfs_leaf_index() {
+        return(this.$sdfs_leafs().indexOf(this));
+    }
+    $sdfs_nonleaf_index() {
+        return(this.$sdfs_nonleafs().indexOf(this));
     }
     //
     $sdfs_next_action_for_srch() {
