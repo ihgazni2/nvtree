@@ -1170,18 +1170,29 @@ function _replace_with(that,nd,deep_copy) {
 
 
 class _Node {
-    #et = new ET();
-    constructor() {
+    #et = null
+    #opt = {with_id:true,with_et:true} 
+    constructor(with_id=true,with_et=true) {
         init_internal_prop(this);
         this._fstch = null;
-        this.$guid = cmmn.gen_guid();
+        ////
+        this.#opt.with_id = with_id;
+        this.#opt.with_et = with_et;        
+        if(with_id) {this.$guid = cmmn.gen_guid();}
+        if(with_et) {this.#et = new ET()}
     }
+    ////
+    get opt() {return(this.#opt)}
+    ////
+    enable_et() {this.#et = new ET()}
+    disable_et() {this.#et = null}
     get et() {return(this.#et)}
     regis_recv_from_handler(handler) {
         let _handler = function (e) {handler(e.data.src,e.data.msg)}
         this.et.addEventListener('$msg__',_handler)
     }
     send_to(nd,msg) {nd.et.dispatch('$msg__',{src:this,msg:msg})}
+    ////
     $is_inited() {
         return(_is_inited(this))
     }
@@ -1274,15 +1285,15 @@ class _Node {
     }
     //
     $prepend_child(child) {
-        child = (child===undefined)?(new _Node()):child
+        child = (child===undefined)?(new _Node(this.#opt.with_id,this.#opt.with_et)):child
         return(_prepend_child(this,child))       
     }
     $insert_child(which,child) {
-        child = (child===undefined)?(new _Node()):child
+        child = (child===undefined)?(new _Node(this.#opt.with_id,this.#opt.with_et)):child
         return(_insert_child(which,this,child))
     }
     $append_child(child)  {
-        child = (child===undefined)?(new _Node()):child
+        child = (child===undefined)?(new _Node(this.#opt.with_id,this.#opt.with_et)):child
         return(_append_child(this,child))
     }
     $clone() {
@@ -1302,7 +1313,7 @@ class _Node {
     $append_children(n,child) {
         let children = []
         for(let i=0;i<n;i++) {
-            let ch = (child===undefined)?(new _Node()):child.$clone()
+            let ch = (child===undefined)?(new _Node(this.#opt.with_id,this.#opt.with_et)):child.$clone()
             ch = _append_child(this,ch)
             children.push(ch)
         }
@@ -1310,11 +1321,11 @@ class _Node {
     }
     //
     $add_rsib(rsib) {
-        rsib = (rsib===undefined)?(new _Node()):rsib
+        rsib = (rsib===undefined)?(new _Node(this.#opt.with_id,this.#opt.with_et)):rsib
         return(_add_rsib(this,rsib))
     }
     $add_lsib(lsib)  {
-        lsib = (lsib===undefined)?(new _Node()):lsib
+        lsib = (lsib===undefined)?(new _Node(this.#opt.with_id,this.#opt.with_et)):lsib
         return(_add_lsib(this,lsib))
     }  
     //
@@ -1533,7 +1544,13 @@ class _Node {
     }
     //
     [Symbol.iterator]() {return(this.$sdfs()[Symbol.iterator]())}
-    get [Symbol.toStringTag]() { return(this.$guid.substr(0,8))}
+    get [Symbol.toStringTag]() { 
+        if(this.$guid){
+            return(this.$guid.substr(0,8))
+        } else {
+            return("<empty>")
+        }
+    }
 }
 
 Object.defineProperty(_Node,"name",{value:"\u200d"})
@@ -1688,8 +1705,8 @@ function _dump(rt) {
 
 
 class Tree extends _Node {
-    constructor() {
-        super();
+    constructor(with_id=true,with_et=true) {
+        super(with_id,with_et);
         //初始化为根节点,根节点代表一棵树
         this._fstch = null
         this._lsib = null
