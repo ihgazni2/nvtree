@@ -1,4 +1,4 @@
-const {v4} = require("uuid");
+const {creat_id} = require("nv-facutil-basic");
 
 
 function range(si,ei) {
@@ -102,7 +102,7 @@ function is_cu_property(prop) {
 
 
 module.exports = {
-    gen_guid:v4,
+    gen_guid:creat_id,
     range:range,
     seqs_slct:seqs_slct,
     dict_length:dict_length,
